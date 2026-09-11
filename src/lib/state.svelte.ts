@@ -1,12 +1,14 @@
 import { BASE_PX_PER_MM } from './constants';
 import { clamp, screenToImg } from './geometry';
+import type { ImageCenterScreenFn } from './interfaces/stageCanvas.interfaces';
 import { LINE_TYPE_LABEL } from './types';
 import type {
   GoldenMode, Measurement, Point, RefObject, RefObjectType, ScaleDim, Tool, Unit, VanishingRay,
 } from './types';
 
+export const DEFAULT_REF_COLOR = '#808080';
 function freshTypeCounters(): Record<RefObjectType, number> {
-  return { h: 0, v: 0, edge: 0, custom: 0, point: 0 };
+  return { h: 0, v: 0, edge: 0, custom: 0, point: 0, };
 }
 
 export const toolState = $state({
@@ -277,17 +279,18 @@ export function handleToolClick(mx: number, my: number) {
         const type: RefObjectType = tool === 'line-edge' ? 'edge' : 'custom';
         toolState.refObjects.push({
           id: toolState.nextId++, type, name: nextName(type),
-          ax: toolState.pendingPoint.x, ay: toolState.pendingPoint.y, bx: p.x, by: p.y,
+          ax: toolState.pendingPoint.x, ay: toolState.pendingPoint.y, bx: p.x, by: p.y, locked: false,
+          color: DEFAULT_REF_COLOR,
         });
       }
       toolState.pendingPoint = null;
     }
   } else if (tool === 'line-h') {
-    toolState.refObjects.push({ id: toolState.nextId++, type: 'h', name: nextName('h'), ax: 0, ay: p.y, bx: 0, by: p.y });
+    toolState.refObjects.push({ id: toolState.nextId++, type: 'h', name: nextName('h'), ax: 0, ay: p.y, bx: 0, by: p.y, locked: false, color: DEFAULT_REF_COLOR, });
   } else if (tool === 'line-v') {
-    toolState.refObjects.push({ id: toolState.nextId++, type: 'v', name: nextName('v'), ax: p.x, ay: 0, bx: p.x, by: 0 });
+    toolState.refObjects.push({ id: toolState.nextId++, type: 'v', name: nextName('v'), ax: p.x, ay: 0, bx: p.x, by: 0, locked: false, color: DEFAULT_REF_COLOR, });
   } else if (tool === 'point') {
-    toolState.refObjects.push({ id: toolState.nextId++, type: 'point', name: nextName('point'), ax: p.x, ay: p.y, bx: p.x, by: p.y });
+    toolState.refObjects.push({ id: toolState.nextId++, type: 'point', name: nextName('point'), ax: p.x, ay: p.y, bx: p.x, by: p.y, locked: false, color: DEFAULT_REF_COLOR, });
   } else if (tool === 'vp-place') {
     toolState.vanishingPoint = { x: p.x, y: p.y };
   } else if (tool === 'vp-ray') {
@@ -305,6 +308,13 @@ export function renameRefObject(id: number, name: string) {
   const o = toolState.refObjects.find((o) => o.id === id);
   if (o && name.trim()) o.name = name.trim();
 }
+export function setRefObjectColor(id: number, color: string) {
+  const o = toolState.refObjects.find((o) => o.id === id);
+
+  if (o) {
+    o.color = color;
+  }
+}
 export function deleteVanishingRay(id: number) {
   toolState.vpRays = toolState.vpRays.filter((r) => r.id !== id);
 }
@@ -317,14 +327,24 @@ export function deleteVanishingPoint() {
 // ---------------------------------------------------------------
 // Dragging existing objects on the canvas
 // ---------------------------------------------------------------
-export function findNearPointObject(mx: number, my: number): RefObject | null {
+export function findNearPointObject(
+  mx: number,
+  my: number,
+): RefObject | null {
   for (let i = toolState.refObjects.length - 1; i >= 0; i--) {
     const o = toolState.refObjects[i];
+
+    if (o.locked) continue;
     if (o.type !== 'point') continue;
+
     const sx = o.ax * toolState.zoom + toolState.panX;
     const sy = o.ay * toolState.zoom + toolState.panY;
-    if (Math.hypot(sx - mx, sy - my) < 10) return o;
+
+    if (Math.hypot(sx - mx, sy - my) < 10) {
+      return o;
+    }
   }
+
   return null;
 }
 
@@ -342,4 +362,124 @@ export function dragRefObjectTo(o: RefObject, mx: number, my: number) {
 
 export function dragVanishingPointTo(mx: number, my: number) {
   toolState.vanishingPoint = screenToImg(mx, my, toolState.zoom, toolState.panX, toolState.panY);
+}
+export const imageCenterScreen: ImageCenterScreenFn = () => {
+  return {
+    x: toolState.panX + (toolState.orientedW / 2) * toolState.zoom,
+    y: toolState.panY + (toolState.orientedH / 2) * toolState.zoom,
+  };
+};
+export function toggleRefObjectLock(id: number) {
+  const o = toolState.refObjects.find((o) => o.id === id);
+  if (!o) return;
+
+  o.locked = !o.locked;
+}
+
+export function findNearRefEndpoint(
+  mx: number,
+  my: number,
+): { object: RefObject; endpoint: 'a' | 'b' } | null {
+  for (let i = toolState.refObjects.length - 1; i >= 0; i--) {
+    const o = toolState.refObjects[i];
+
+    if (o.locked) continue;
+
+    // Horizontal y vertical tienen un único punto de anclaje.
+    if (o.type === 'h' || o.type === 'v') {
+      const ax = o.ax * toolState.zoom + toolState.panX;
+      const ay = o.ay * toolState.zoom + toolState.panY;
+
+      if (Math.hypot(ax - mx, ay - my) < 10) {
+        return {
+          object: o,
+          endpoint: 'a',
+        };
+      }
+
+      continue;
+    }
+
+    // Custom y edge tienen dos puntos de control.
+    if (o.type !== 'custom' && o.type !== 'edge') continue;
+
+    const ax = o.ax * toolState.zoom + toolState.panX;
+    const ay = o.ay * toolState.zoom + toolState.panY;
+
+    if (Math.hypot(ax - mx, ay - my) < 10) {
+      return {
+        object: o,
+        endpoint: 'a',
+      };
+    }
+
+    const bx = o.bx * toolState.zoom + toolState.panX;
+    const by = o.by * toolState.zoom + toolState.panY;
+
+    if (Math.hypot(bx - mx, by - my) < 10) {
+      return {
+        object: o,
+        endpoint: 'b',
+      };
+    }
+  }
+
+  return null;
+}
+
+export function dragRefEndpointTo(
+  o: RefObject,
+  endpoint: 'a' | 'b',
+  mx: number,
+  my: number,
+) {
+  const p = screenToImg(
+    mx,
+    my,
+    toolState.zoom,
+    toolState.panX,
+    toolState.panY,
+  );
+
+  // Las líneas horizontales tienen un solo dato relevante:
+  // su posición Y. El punto de anclaje se mueve solamente en vertical.
+  if (o.type === 'h') {
+    o.ay = p.y;
+    o.by = p.y;
+    return;
+  }
+
+  // Las líneas verticales tienen un solo dato relevante:
+  // su posición X. El punto de anclaje se mueve solamente en horizontal.
+  if (o.type === 'v') {
+    o.ax = p.x;
+    o.bx = p.x;
+    return;
+  }
+
+  // Custom y edge conservan sus dos extremos independientes.
+  if (endpoint === 'a') {
+    o.ax = p.x;
+    o.ay = p.y;
+  } else {
+    o.bx = p.x;
+    o.by = p.y;
+  }
+}
+
+export function dragRefObjectAsWhole(
+  o: RefObject,
+  startA: Point,
+  startB: Point,
+  dxScreen: number,
+  dyScreen: number,
+) {
+  const dx = dxScreen / toolState.zoom;
+  const dy = dyScreen / toolState.zoom;
+
+  o.ax = startA.x + dx;
+  o.ay = startA.y + dy;
+
+  o.bx = startB.x + dx;
+  o.by = startB.y + dy;
 }

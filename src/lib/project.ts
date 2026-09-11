@@ -1,52 +1,86 @@
 import { drawGoldenRatio, drawGrid, drawMeasurements, drawReferenceObjects, drawVanishingPoint } from './draw';
-import { rebuildOriented, loadImageFromDataUrl, toolState } from './state.svelte';
+import { rebuildOriented, loadImageFromDataUrl, toolState, DEFAULT_REF_COLOR } from './state.svelte';
 import { LINE_TYPE_LABEL } from './types';
 import type { ProjectFile, RefObjectType } from './types';
 
 export function saveProject() {
-  if (!toolState.image) { alert('Carga una imagen primero.'); return; }
+  if (!toolState.image) {
+    alert('Carga una imagen primero.');
+    return;
+  }
+
   const tmp = document.createElement('canvas');
-  tmp.width = toolState.naturalW; tmp.height = toolState.naturalH;
+  tmp.width = toolState.naturalW;
+  tmp.height = toolState.naturalH;
   tmp.getContext('2d')!.drawImage(toolState.image, 0, 0);
 
   const project: ProjectFile = {
     version: 1,
     image: tmp.toDataURL('image/png'),
-    rotation: toolState.rotation, freeAngle: toolState.freeAngle, flipH: toolState.flipH, flipV: toolState.flipV,
-    scaleDim: toolState.scaleDim, scaleValue: toolState.scaleValue, unit: toolState.unit,
-    gridRows: toolState.gridRows, gridCols: toolState.gridCols,
-    showGrid: toolState.showGrid, showRulerTop: toolState.showRulerTop, showRulerLeft: toolState.showRulerLeft,
+    rotation: toolState.rotation,
+    freeAngle: toolState.freeAngle,
+    flipH: toolState.flipH,
+    flipV: toolState.flipV,
+    scaleDim: toolState.scaleDim,
+    scaleValue: toolState.scaleValue,
+    unit: toolState.unit,
+    gridRows: toolState.gridRows,
+    gridCols: toolState.gridCols,
+    showGrid: toolState.showGrid,
+    showRulerTop: toolState.showRulerTop,
+    showRulerLeft: toolState.showRulerLeft,
     goldenMode: toolState.goldenMode,
     calibrationFactor: toolState.calibrationFactor,
     measurements: toolState.measurements,
     refObjects: toolState.refObjects,
     vanishingPoint: toolState.vanishingPoint,
     vpRays: toolState.vpRays,
+    nextId: toolState.nextId,
   };
-  const blob = new Blob([JSON.stringify(project)], { type: 'application/json' });
+
+  const blob = new Blob(
+    [JSON.stringify(project)],
+    { type: 'application/json' },
+  );
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'proyecto-referencias.json';
+
+  a.href = url;
+  a.download = 'proyecto-referencias.json';
   a.click();
+
   URL.revokeObjectURL(url);
 }
 
 export function loadProject(file: File, onDone: () => void) {
   const reader = new FileReader();
+
   reader.onload = () => {
     let p: ProjectFile;
-    try { p = JSON.parse(reader.result as string); }
-    catch { alert('No se pudo abrir el proyecto: archivo inválido.'); return; }
-    if (!p.image) { alert('El archivo no contiene una imagen de proyecto válida.'); return; }
+
+    try {
+      p = JSON.parse(reader.result as string);
+    } catch {
+      alert('No se pudo abrir el proyecto: archivo inválido.');
+      return;
+    }
+
+    if (!p.image) {
+      alert('El archivo no contiene una imagen de proyecto válida.');
+      return;
+    }
 
     loadImageFromDataUrl(p.image, 'Proyecto cargado', () => {
       toolState.rotation = p.rotation || 0;
       toolState.freeAngle = p.freeAngle || 0;
-      toolState.flipH = !!p.flipH; toolState.flipV = !!p.flipV;
+      toolState.flipH = !!p.flipH;
+      toolState.flipV = !!p.flipV;
       toolState.scaleDim = p.scaleDim || 'width';
       toolState.scaleValue = p.scaleValue || 14.5;
       toolState.unit = p.unit || 'cm';
-      toolState.gridRows = p.gridRows || 10; toolState.gridCols = p.gridCols || 10;
+      toolState.gridRows = p.gridRows || 10;
+      toolState.gridCols = p.gridCols || 10;
       toolState.showGrid = p.showGrid !== false;
       toolState.showRulerTop = p.showRulerTop !== false;
       toolState.showRulerLeft = p.showRulerLeft !== false;
@@ -54,14 +88,43 @@ export function loadProject(file: File, onDone: () => void) {
       toolState.calibrationFactor = p.calibrationFactor || 1;
       toolState.measurements = p.measurements || [];
 
-      const counters: Record<RefObjectType, number> = { h: 0, v: 0, edge: 0, custom: 0, point: 0 };
+      const counters: Record<RefObjectType, number> = {
+        h: 0,
+        v: 0,
+        edge: 0,
+        custom: 0,
+        point: 0,
+      };
+
       toolState.refObjects = (p.refObjects || []).map((o) => {
         counters[o.type] = (counters[o.type] || 0) + 1;
-        return { ...o, name: o.name || `${LINE_TYPE_LABEL[o.type]} ${counters[o.type]}` };
+
+        return {
+          ...o,
+          name:
+            o.name ||
+            `${LINE_TYPE_LABEL[o.type]} ${counters[o.type]}`,
+          locked: o.locked ?? false,
+          color: o.color ?? DEFAULT_REF_COLOR,
+        };
       });
+
       toolState.typeCounters = counters;
       toolState.vanishingPoint = p.vanishingPoint || null;
       toolState.vpRays = p.vpRays || [];
+
+      const maxId = Math.max(
+        0,
+        ...toolState.measurements.map((m) => m.id),
+        ...toolState.refObjects.map((o) => o.id),
+        ...toolState.vpRays.map((r) => r.id),
+      );
+
+      toolState.nextId = Math.max(
+        p.nextId ?? 1,
+        maxId + 1,
+      );
+
       toolState.realSizeActive = false;
       toolState.pendingPoint = null;
       toolState.activeTool = null;
@@ -70,6 +133,7 @@ export function loadProject(file: File, onDone: () => void) {
       onDone();
     });
   };
+
   reader.readAsText(file);
 }
 

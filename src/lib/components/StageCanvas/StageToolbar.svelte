@@ -10,11 +10,15 @@
     let { fitNow,viewport }: Props = $props();
 
   function zoomInClick() {
-    const { w, h } = viewport();
+    const port = viewport();
+    if (!port) return;
+    const { w, h } = port;
     setZoom(toolState.zoom * 1.25, w / 2, h / 2);
   }
   function zoomOutClick() {
-    const { w, h } = viewport();
+    const port = viewport();
+    if (!port) return;
+    const { w, h } = port;
     setZoom(toolState.zoom / 1.25, w / 2, h / 2);
   }
 </script>

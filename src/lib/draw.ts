@@ -28,11 +28,24 @@ export function drawGrid(
   ctx.restore();
 }
 
-export function drawRefLine(ctx: CanvasRenderingContext2D, sx1: number, sy1: number, sx2: number, sy2: number, dashed = false) {
+export function drawRefLine(
+  ctx: CanvasRenderingContext2D,
+  sx1: number,
+  sy1: number,
+  sx2: number,
+  sy2: number,
+  dashed = false,
+  color = '#808080',
+) {
   ctx.save();
-  ctx.strokeStyle = 'rgba(111,183,201,0.9)';
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.9;
   ctx.lineWidth = 1.3;
-  if (dashed) ctx.setLineDash([6, 4]);
+
+  if (dashed) {
+    ctx.setLineDash([6, 4]);
+  }
+
   ctx.beginPath();
   ctx.moveTo(sx1, sy1);
   ctx.lineTo(sx2, sy2);
@@ -81,7 +94,7 @@ function drawMeasureLine(ctx: CanvasRenderingContext2D, a: Point, b: Point, labe
   ctx.font = '600 11.5px ' + FONT;
   const tw = ctx.measureText(label).width;
   ctx.fillStyle = 'rgba(11,18,28,0.85)';
-  ctx.fillRect(midX - tw/2 - 5, midY - 18, tw + 10, 16);
+  ctx.fillRect(midX - tw / 2 - 5, midY - 18, tw + 10, 16);
   ctx.fillStyle = '#E9E4D8';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
@@ -126,27 +139,129 @@ export function drawGoldenRatio(
 }
 
 export function drawReferenceObjects(
-  ctx: CanvasRenderingContext2D, objects: RefObject[], W: number, H: number,
-  zoom: number, panX: number, panY: number
+  ctx: CanvasRenderingContext2D,
+  objects: RefObject[],
+  W: number,
+  H: number,
+  zoom: number,
+  panX: number,
+  panY: number,
+  showNames = false,
 ) {
   const ts = (p: Point) => toScreen(p, zoom, panX, panY);
+
   objects.forEach((o) => {
-    if (o.type === 'point') { drawPointMarker(ctx, ts({ x: o.ax, y: o.ay }), '#6FB7C9'); return; }
-    if (o.type === 'custom') {
-      const a = ts({ x: o.ax, y: o.ay }), b = ts({ x: o.bx, y: o.by });
-      drawRefLine(ctx, a.x, a.y, b.x, b.y);
-      drawPointMarker(ctx, a, '#6FB7C9'); drawPointMarker(ctx, b, '#6FB7C9');
+    // -------------------------------------------------------------
+    // Punto
+    // -------------------------------------------------------------
+    if (o.type === 'point') {
+      drawPointMarker(
+        ctx,
+        ts({ x: o.ax, y: o.ay }),
+        o.color,
+      );
       return;
     }
-    let dx: number, dy: number, x0: number, y0: number;
-    if (o.type === 'h') { dx = 1; dy = 0; x0 = o.ax; y0 = o.ay; }
-    else if (o.type === 'v') { dx = 0; dy = 1; x0 = o.ax; y0 = o.ay; }
-    else { dx = o.bx - o.ax; dy = o.by - o.ay; x0 = o.ax; y0 = o.ay; }
-    const c = clipRay(x0, y0, dx, dy, 0, W, 0, H);
+
+    // -------------------------------------------------------------
+    // Línea personalizada: segmento A → B
+    // -------------------------------------------------------------
+    if (o.type === 'custom') {
+      const a = ts({ x: o.ax, y: o.ay });
+      const b = ts({ x: o.bx, y: o.by });
+
+      drawRefLine(ctx, a.x, a.y, b.x, b.y, false, o.color,);
+
+      drawPointMarker(ctx, a, o.color);
+      drawPointMarker(ctx, b, o.color);
+
+      return;
+    }
+
+    // -------------------------------------------------------------
+    // Línea horizontal / vertical / extremo a extremo
+    // -------------------------------------------------------------
+    let dx: number;
+    let dy: number;
+    let x0: number;
+    let y0: number;
+
+    if (o.type === 'h') {
+      dx = 1;
+      dy = 0;
+      x0 = o.ax;
+      y0 = o.ay;
+    } else if (o.type === 'v') {
+      dx = 0;
+      dy = 1;
+      x0 = o.ax;
+      y0 = o.ay;
+    } else {
+      // edge
+      dx = o.bx - o.ax;
+      dy = o.by - o.ay;
+      x0 = o.ax;
+      y0 = o.ay;
+    }
+
+    const c = clipRay(
+      x0,
+      y0,
+      dx,
+      dy,
+      0,
+      W,
+      0,
+      H,
+    );
+
     if (!c) return;
-    const a = ts({ x: c.x1, y: c.y1 }), b = ts({ x: c.x2, y: c.y2 });
-    drawRefLine(ctx, a.x, a.y, b.x, b.y);
+
+    const a = ts({ x: c.x1, y: c.y1 });
+    const b = ts({ x: c.x2, y: c.y2 });
+
+    drawRefLine(ctx, a.x, a.y, b.x, b.y, false, o.color);
+
+    // -------------------------------------------------------------
+    // Puntos de control / ancla
+    // -------------------------------------------------------------
+    if (o.type === 'h' || o.type === 'v') {
+      const anchor = ts({
+        x: o.ax,
+        y: o.ay,
+      });
+
+      drawPointMarker(ctx, anchor, o.color);
+    }
+
+    if (o.type === 'edge') {
+      const p1 = ts({
+        x: o.ax,
+        y: o.ay,
+      });
+
+      const p2 = ts({
+        x: o.bx,
+        y: o.by,
+      });
+
+      drawPointMarker(ctx, p1, o.color);
+      drawPointMarker(ctx, p2, o.color);
+    }
   });
+  if (showNames) {
+    objects.forEach((o) => {
+      const p = ts(refLabelPoint(o));
+
+      drawRefName(
+        ctx,
+        o.name,
+        p.x,
+        p.y,
+        o.color,
+      );
+    });
+  }
 }
 
 export function drawVanishingPoint(
@@ -281,4 +396,59 @@ export function drawRulerLeft(
       ctx.stroke();
     }
   }
+}
+
+function drawRefName(
+  ctx: CanvasRenderingContext2D,
+  name: string,
+  x: number,
+  y: number,
+  color: string,
+) {
+  ctx.save();
+
+  ctx.font = '12px -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
+
+  const paddingX = 6;
+  const paddingY = 4;
+  const metrics = ctx.measureText(name);
+
+  const width = metrics.width + paddingX * 2;
+  const height = 20;
+
+  const boxX = x + 10;
+  const boxY = y - height - 8;
+
+  ctx.fillStyle = 'rgba(20, 24, 28, 0.92)';
+  ctx.beginPath();
+  ctx.roundRect(boxX, boxY, width, height, 4);
+  ctx.fill();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(
+    name,
+    boxX + paddingX,
+    boxY + height / 2,
+  );
+
+  ctx.restore();
+}
+
+function refLabelPoint(o: RefObject): Point {
+  if (o.type === 'custom' || o.type === 'edge') {
+    return {
+      x: (o.ax + o.bx) / 2,
+      y: (o.ay + o.by) / 2,
+    };
+  }
+
+  return {
+    x: o.ax,
+    y: o.ay,
+  };
 }

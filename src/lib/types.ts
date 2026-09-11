@@ -9,8 +9,12 @@ export interface RefObject {
   id: number;
   type: RefObjectType;
   name: string;
-  ax: number; ay: number;
-  bx: number; by: number;
+  ax: number;
+  ay: number;
+  bx: number;
+  by: number;
+  locked: boolean;
+  color: string;
 }
 
 export interface Measurement {
@@ -55,7 +59,7 @@ export interface Arc {
 
 export interface ProjectFile {
   version: 1;
-  image: string; // data URL
+  image: string;
   rotation: number;
   freeAngle?: number;
   flipH: boolean;
@@ -74,4 +78,5 @@ export interface ProjectFile {
   refObjects: RefObject[];
   vanishingPoint: Point | null;
   vpRays: VanishingRay[];
+  nextId: number;
 }

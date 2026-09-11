@@ -44,7 +44,7 @@ export function clipRay(
     tmin = Math.max(tmin, t1); tmax = Math.min(tmax, t2);
   } else if (y0 < ymin || y0 > ymax) return null;
   if (tmin > tmax) return null;
-  return { x1: x0 + dx*tmin, y1: y0 + dy*tmin, x2: x0 + dx*tmax, y2: y0 + dy*tmax };
+  return { x1: x0 + dx * tmin, y1: y0 + dy * tmin, x2: x0 + dx * tmax, y2: y0 + dy * tmax };
 }
 
 export function measureDist(m: Measurement, pxPerUnit: number) {
@@ -105,10 +105,34 @@ export function screenToImg(mx: number, my: number, zoom: number, panX: number, 
 }
 
 /** Type-appropriate readout for a reference line/point: only the axis that matters for h/v lines. */
-export function refObjectInfo(o: RefObject, pxPerUnit: number, unit: string): string {
-  if (o.type === 'point') return `X: ${fmt(o.ax / pxPerUnit)} ${unit}   Y: ${fmt(o.ay / pxPerUnit)} ${unit}`;
-  if (o.type === 'h') return `Y: ${fmt(o.ay / pxPerUnit)} ${unit}`;
-  if (o.type === 'v') return `X: ${fmt(o.ax / pxPerUnit)} ${unit}`;
-  const dx = o.bx - o.ax, dy = o.by - o.ay;
-  return `Longitud: ${fmt(Math.hypot(dx, dy) / pxPerUnit)} ${unit}`;
+export function refObjectInfo(o: RefObject, pxPerUnit: number, unit: string): string[] {
+  if (o.type === 'point') {
+    return [`X: ${fmt(o.ax / pxPerUnit)} ${unit}   Y: ${fmt(o.ay / pxPerUnit)} ${unit}`];
+  }
+
+  if (o.type === 'h') {
+    return [`Y: ${fmt(o.ay / pxPerUnit)} ${unit}`];
+  }
+
+  if (o.type === 'v') {
+    return [`X: ${fmt(o.ax / pxPerUnit)} ${unit}`];
+  }
+
+  const dx = o.bx - o.ax;
+  const dy = o.by - o.ay;
+  const distance = Math.hypot(dx, dy) / pxPerUnit;
+
+  if (o.type === 'custom') {
+    const p1x = fmt(o.ax / pxPerUnit);
+    const p1y = fmt(o.ay / pxPerUnit);
+    const p2x = fmt(o.bx / pxPerUnit);
+    const p2y = fmt(o.by / pxPerUnit);
+
+    return [`P1: X ${p1x} ${unit}   Y ${p1y} ${unit}`,
+    `P2: X ${p2x} ${unit}   Y ${p2y} ${unit}`,
+    `Distancia: ${fmt(distance)} ${unit}`
+    ];
+  }
+
+  return [`Longitud: ${fmt(distance)} ${unit}`];
 }

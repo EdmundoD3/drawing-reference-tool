@@ -1,11 +1,11 @@
 export interface FitNowFn { (): void };
 
 export interface ViewportFn {
-    (): {
-        w: number;
-        h: number;
-    }
-};
+  (): {
+    w: number;
+    h: number;
+  } | undefined;
+}
 
 export interface ReapplyRealSizeIfActiveFn { (): void };
 
