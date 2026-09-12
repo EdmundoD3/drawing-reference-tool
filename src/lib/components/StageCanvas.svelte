@@ -2,24 +2,11 @@
   import { onMount } from "svelte";
   import {
     toolState,
-    setZoom,
     fitToScreen,
-    handleToolClick,
-    setTool,
-    findNearPointObject,
-    nearVanishingPoint,
-    dragRefObjectTo,
-    dragVanishingPointTo,
     loadImageFile,
     applyRealSizeZoom,
     toggleRealSize,
-    setFreeAngle,
-    imageCenterScreen,
-    dragRefEndpointTo,
-    findNearRefEndpoint,
-    dragRefObjectAsWhole,
   } from "../state.svelte";
-  import { fmt, screenToImg } from "../geometry";
   import {
     drawGrid,
     drawGoldenRatio,
@@ -35,12 +22,7 @@
   } from "../interfaces/stageCanvas.interfaces";
   import {
     canvasArea,
-    coordsText,
-    dragging,
-    hoverTarget,
-    isPanning,
     mainCanvas,
-    panStart,
     rulerCanvas,
     showRefNames,
   } from "../shared/stageCanvas.svelte";
@@ -49,6 +31,7 @@
   import CanvasWrap from "./StageCanvas/CanvasWrap.svelte";
   import EmptyOverlay from "./StageCanvas/EmptyOverlay.svelte";
   import FileInput from "./StageCanvas/FileInput.svelte";
+  import { onKeyDown, onMouseMove, onMouseUp, onWheel } from "../shared/canvasInteractions";
 
   const viewport: ViewportFn = () => {
     if (!mainCanvas.value) return;
@@ -245,129 +228,6 @@
         toolState.zoom,
         toolState.panY,
       );
-    }
-  }
-
-  // ---------------------------------------------------------------
-  // Zoom controls
-  // ---------------------------------------------------------------
-
-  function onWheel(e: WheelEvent) {
-    if (!toolState.oriented) return;
-    e.preventDefault();
-    if (!mainCanvas.value) return;
-    const rect = mainCanvas.value.getBoundingClientRect();
-    const mx = e.clientX - rect.left,
-      my = e.clientY - rect.top;
-    const factor = Math.pow(1.0015, -e.deltaY);
-    setZoom(toolState.zoom * factor, mx, my);
-  }
-
-  // ---------------------------------------------------------------
-  // Pointer interaction: pan, drag existing points, or run the active tool
-  // ---------------------------------------------------------------
-
-  function onMouseMove(e: MouseEvent) {
-    if (!toolState.oriented) return;
-    if (!mainCanvas.value) return;
-    const rect = mainCanvas.value.getBoundingClientRect();
-    const mx = e.clientX - rect.left,
-      my = e.clientY - rect.top;
-    const inside = mx >= 0 && my >= 0 && mx <= rect.width && my <= rect.height;
-
-    if (dragging.handle) {
-      const c = imageCenterScreen();
-      const mouseAngle = Math.atan2(my - c.y, mx - c.x);
-      let deg = ((mouseAngle + Math.PI / 2) * 180) / Math.PI;
-      deg = ((((deg + 180) % 360) + 360) % 360) - 180;
-      setFreeAngle(deg);
-      return;
-    }
-
-    if (dragging.isDragging) {
-      const dx = e.clientX - dragging.startX,
-        dy = e.clientY - dragging.startY;
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragging.moved = true;
-      if (dragging.vanishingPoint) {
-        dragVanishingPointTo(mx, my);
-      } else if (dragging.refObj && dragging.refMoveMode === "translate") {
-        dragRefObjectAsWhole(
-          dragging.refObj,
-          dragging.refStartA,
-          dragging.refStartB,
-          e.clientX - dragging.startX,
-          e.clientY - dragging.startY,
-        );
-      } else if (dragging.refObj && dragging.refEndpoint) {
-        dragRefEndpointTo(dragging.refObj, dragging.refEndpoint, mx, my);
-      } else if (dragging.refObj) {
-        dragRefObjectTo(dragging.refObj, mx, my);
-      } else if (toolState.activeTool === null) {
-        toolState.panX = panStart.x + dx;
-        toolState.panY = panStart.y + dy;
-      }
-    } else if (toolState.activeTool === null) {
-      hoverTarget.value =
-        inside &&
-        (nearVanishingPoint(mx, my) ||
-          !!findNearRefEndpoint(mx, my) ||
-          !!findNearPointObject(mx, my));
-    }
-
-    if (inside) {
-      const p = screenToImg(
-        mx,
-        my,
-        toolState.zoom,
-        toolState.panX,
-        toolState.panY,
-      );
-      coordsText.x = `${fmt(p.x / toolState.pxPerUnit)} ${toolState.unit}`;
-      coordsText.y = `${fmt(p.y / toolState.pxPerUnit)} ${toolState.unit}`;
-      toolState.hoverPoint = p;
-    } else {
-      coordsText.x = "—";
-      coordsText.y = "—";
-      toolState.hoverPoint = null;
-    }
-  }
-
-  function onMouseUp(e: MouseEvent) {
-    if (dragging.handle) {
-      dragging.handle = false;
-      return;
-    }
-
-    if (!dragging.isDragging) return;
-
-    const wasClick = !dragging.moved;
-
-    dragging.isDragging = false;
-    dragging.vanishingPoint = false;
-    dragging.refObj = null;
-    dragging.refEndpoint = null;
-    dragging.refMoveMode = null;
-
-    isPanning.value = false;
-
-    if (wasClick && toolState.activeTool) {
-      if (!mainCanvas.value) return;
-
-      const rect = mainCanvas.value.getBoundingClientRect();
-
-      const mx = e.clientX - rect.left,
-        my = e.clientY - rect.top;
-
-      if (mx >= 0 && my >= 0 && mx <= rect.width && my <= rect.height) {
-        handleToolClick(mx, my);
-      }
-    }
-  }
-
-  function onKeyDown(e: KeyboardEvent) {
-    if (e.key === "Escape") {
-      if (toolState.pendingPoint) toolState.pendingPoint = null;
-      else setTool(null);
     }
   }
 

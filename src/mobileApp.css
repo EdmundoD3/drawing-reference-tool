@@ -1,0 +1,274 @@
+.mobile-panel-button {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .mobile-panel-button {
+        display: block;
+
+        position: fixed;
+        z-index: 30;
+
+        right: 10px;
+        bottom: 10px;
+
+        min-height: 40px;
+        padding: 8px 12px;
+
+        background: var(--ink);
+        border: 1px solid var(--line);
+        color: var(--text);
+
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+}
+
+/* -------------------------------------------------------
+   Mobile sidebar backdrop
+   ------------------------------------------------------- */
+
+.sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .sidebar-backdrop {
+        display: block;
+
+        position: fixed;
+        z-index: 15;
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.35);
+
+        opacity: 0;
+        pointer-events: none;
+
+        transition: opacity 180ms ease;
+    }
+
+    .sidebar-backdrop.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* =========================================================
+   Mobile layout
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    /* -------------------------------------------------------
+     App
+     ------------------------------------------------------- */
+
+    .app {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100dvh;
+    }
+
+
+    /* -------------------------------------------------------
+     Sidebar
+     ------------------------------------------------------- */
+
+    .sidebar {
+        position: fixed;
+        z-index: 20;
+
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        width: 100%;
+        height: min(75dvh, 620px);
+
+        border-right: none;
+        border-top: 1px solid var(--line);
+
+        transform: translateY(100%);
+        transition: transform 180ms ease;
+    }
+
+    .sidebar.open {
+        transform: translateY(0);
+    }
+
+
+    /* -------------------------------------------------------
+     Stage
+     ------------------------------------------------------- */
+
+    .stage {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        flex: 1;
+    }
+
+
+    /* -------------------------------------------------------
+     Toolbar
+     ------------------------------------------------------- */
+
+    .stage-toolbar {
+        height: 48px;
+        padding: 0 8px;
+        gap: 8px;
+
+        font-size: 11px;
+    }
+
+    .zoomctl {
+        gap: 4px;
+    }
+
+    .zoomctl button {
+        min-width: 40px;
+        min-height: 36px;
+        padding: 6px 9px;
+    }
+
+    .zoomval {
+        min-width: 46px;
+    }
+
+    /* Coordinates take too much room on narrow screens. */
+    .coords {
+        display: none;
+    }
+
+    /* Temporary desktop hint is not useful on touch. */
+    .toolhint {
+        display: none;
+    }
+
+    /* -------------------------------------------------------
+     Canvas + rulers
+     ------------------------------------------------------- */
+
+    .canvas-wrap {
+        grid-template-columns: 26px 1fr;
+        grid-template-rows: 26px 1fr;
+    }
+
+    .empty-overlay {
+        inset: 26px 0 0 26px;
+    }
+
+
+    /* -------------------------------------------------------
+     Empty image overlay
+     ------------------------------------------------------- */
+
+    .empty-overlay .box {
+        max-width: calc(100vw - 32px);
+
+        padding: 28px 24px;
+
+        font-size: 13px;
+    }
+
+    .empty-overlay .box strong {
+        font-size: 14px;
+    }
+
+
+    /* -------------------------------------------------------
+     Calibration
+     ------------------------------------------------------- */
+
+    .calib-overlay {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+
+        transform: none;
+
+        padding: 12px;
+    }
+
+    .calib-controls {
+        width: 100%;
+        max-width: none;
+
+        gap: 8px;
+    }
+
+    .calib-controls input {
+        width: 80px;
+        min-height: 40px;
+    }
+
+    .calib-controls button,
+    .calib-controls select {
+        min-height: 40px;
+    }
+
+
+    /* -------------------------------------------------------
+     Touch-friendly controls
+     ------------------------------------------------------- */
+
+    button {
+        min-height: 40px;
+    }
+
+    select,
+    input[type=number],
+    input[type=text] {
+        min-height: 40px;
+    }
+
+    .check {
+        min-height: 40px;
+    }
+
+
+    /* -------------------------------------------------------
+     Panels
+     ------------------------------------------------------- */
+
+    .panel {
+        padding: 14px 16px;
+    }
+
+    .brand {
+        padding: 16px;
+    }
+}
+
+
+/* =========================================================
+   Very narrow phones
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    .stage-toolbar {
+        padding: 0 6px;
+        gap: 5px;
+    }
+
+    .zoomctl button {
+        min-width: 38px;
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+
+    .zoomval {
+        min-width: 42px;
+    }
+
+    .sidebar {
+        height: 80dvh;
+    }
+
+    .panel {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+}

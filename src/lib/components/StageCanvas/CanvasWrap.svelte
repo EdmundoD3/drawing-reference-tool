@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onHandleMouseDown, onMouseDown } from "../../shared/canvasInteractions";
+
   // CanvasWrap.svelte
   import {
     dragging,
@@ -35,78 +37,7 @@
     };
   });
 
-  function onHandleMouseDown(e: MouseEvent) {
-    e.stopPropagation();
-    dragging.handle = true;
-  }
 
-  // ---------------------------------------------------------------
-  // Pointer interaction: pan, drag existing points, or run the active tool
-  // ---------------------------------------------------------------
-  function onMouseDown(e: MouseEvent) {
-    if (!toolState.oriented) return;
-    if (!mainCanvas.value) return;
-    const rect = mainCanvas.value.getBoundingClientRect();
-    const mx = e.clientX - rect.left,
-      my = e.clientY - rect.top;
-    dragging.startX = e.clientX;
-    dragging.startY = e.clientY;
-    dragging.moved = false;
-
-    if (toolState.activeTool === null && nearVanishingPoint(mx, my)) {
-      dragging.vanishingPoint = true;
-      dragging.isDragging = true;
-      return;
-    }
-    if (toolState.activeTool === null) {
-      const endpoint = findNearRefEndpoint(mx, my);
-
-      if (endpoint) {
-        dragging.refObj = endpoint.object;
-        dragging.refEndpoint = endpoint.endpoint;
-
-        dragging.refStartA = {
-          x: endpoint.object.ax,
-          y: endpoint.object.ay,
-        };
-
-        dragging.refStartB = {
-          x: endpoint.object.bx,
-          y: endpoint.object.by,
-        };
-
-        // Ctrl + arrastrar cualquiera de los extremos traslada
-        // la línea completa sin cambiar su longitud ni orientación.
-        // La línea en sí NO es arrastrable para evitar interferencias
-        // con otros puntos u objetos que puedan quedar debajo.
-        if (
-          e.ctrlKey &&
-          (endpoint.object.type === "custom" || endpoint.object.type === "edge")
-        ) {
-          dragging.refMoveMode = "translate";
-        } else {
-          dragging.refMoveMode = "endpoint";
-        }
-
-        dragging.isDragging = true;
-        return;
-      }
-
-      const po = findNearPointObject(mx, my);
-
-      if (po) {
-        dragging.refObj = po;
-        dragging.refEndpoint = null;
-        dragging.refMoveMode = null;
-        dragging.isDragging = true;
-        return;
-      }
-    }
-    dragging.isDragging = true;
-    panStart.x = toolState.panX;
-    panStart.y = toolState.panY;
-    if (toolState.activeTool === null) isPanning.value = true;
-  }
   function onKeyDown(e: KeyboardEvent) {
   if (e.key === 'Shift') {
     showRefNames.value = true;

@@ -129,7 +129,7 @@
               {:else}
                 <button
                   class="name-button"
-                  title="Doble clic para renombrar"
+                  title="Clic para renombrar"
                   onclick={() => handleRename(o.id, o.name)}
                 >
                   {o.name}
