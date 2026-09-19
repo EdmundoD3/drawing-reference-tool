@@ -1,6 +1,8 @@
+// main.ts
 import { mount } from 'svelte'
 import './app.css'
 import './mobileApp.css'
+import './rotate.css'
 import App from './App.svelte'
 
 const app = mount(App, {

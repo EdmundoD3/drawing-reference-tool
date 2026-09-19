@@ -1,23 +1,18 @@
 <script lang="ts">
-  import { onHandleMouseDown, onMouseDown } from "../../shared/canvasInteractions";
+  import {
+    onHandlePointerDown,
+    onPointerDown,
+  } from "../../shared/canvasInteractions";
 
   // CanvasWrap.svelte
   import {
-    dragging,
     hoverTarget,
     isPanning,
     mainCanvas,
-    panStart,
     rulerCanvas,
     showRefNames,
   } from "../../shared/stageCanvas.svelte";
-  import {
-    findNearPointObject,
-    findNearRefEndpoint,
-    imageCenterScreen,
-    nearVanishingPoint,
-    toolState,
-  } from "../../state.svelte";
+  import { imageCenterScreen, toolState } from "../../state.svelte";
   import { uiState } from "../../ui.svelte";
   const RADIUS_SCALE = 0.5;
 
@@ -37,18 +32,17 @@
     };
   });
 
-
   function onKeyDown(e: KeyboardEvent) {
-  if (e.key === 'Shift') {
-    showRefNames.value = true;
+    if (e.key === "Shift") {
+      showRefNames.value = true;
+    }
   }
-}
 
-function onKeyUp(e: KeyboardEvent) {
-  if (e.key === 'Shift') {
-    showRefNames.value = false;
+  function onKeyUp(e: KeyboardEvent) {
+    if (e.key === "Shift") {
+      showRefNames.value = false;
+    }
   }
-}
 </script>
 
 <div class="canvas-wrap">
@@ -61,7 +55,7 @@ function onKeyUp(e: KeyboardEvent) {
     class:panning={isPanning.value}
     class:hover-target={hoverTarget.value}
     bind:this={mainCanvas.value}
-    onmousedown={onMouseDown}
+    onpointerdown={onPointerDown}
   ></canvas>
 
   {#if uiState.freeRotateMode && toolState.oriented}
@@ -80,7 +74,7 @@ function onKeyUp(e: KeyboardEvent) {
         aria-label="Rotar libremente"
         aria-valuenow={Math.round(toolState.freeAngle)}
         tabindex="0"
-        onmousedown={onHandleMouseDown}
+        onpointerdown={onHandlePointerDown}
       />
     </svg>
   {/if}

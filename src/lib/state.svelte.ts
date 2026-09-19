@@ -1,3 +1,4 @@
+import { calibrationDefault, estimateCalibration, loadSavedCalibration } from './calibration.svelte';
 import { BASE_PX_PER_MM } from './constants';
 import { clamp, screenToImg } from './geometry';
 import type { ImageCenterScreenFn } from './interfaces/stageCanvas.interfaces';
@@ -7,6 +8,7 @@ import type {
 } from './types';
 
 export const DEFAULT_REF_COLOR = '#808080';
+
 function freshTypeCounters(): Record<RefObjectType, number> {
   return { h: 0, v: 0, edge: 0, custom: 0, point: 0, };
 }
@@ -50,12 +52,18 @@ export const toolState = $state({
   vanishingPoint: null as Point | null,
   vpRays: [] as VanishingRay[],
 
-  calibrationFactor: 1,
+  // calibrar pantalla
+  ...calibrationDefault,
   realSizeActive: false,
+  // zoom y posicion
   savedZoom: 1, savedPanX: 0, savedPanY: 0,
-
+  // 
   nextId: 1,
 });
+
+if (!loadSavedCalibration(toolState)) {
+  estimateCalibration(toolState);
+}
 
 // ---------------------------------------------------------------
 // Image loading & orientation
@@ -245,11 +253,6 @@ export function toggleRealSize(viewportW: number, viewportH: number) {
   } else {
     toolState.zoom = toolState.savedZoom; toolState.panX = toolState.savedPanX; toolState.panY = toolState.savedPanY;
   }
-}
-
-export function calibrate(measuredMm: number) {
-  if (measuredMm <= 0) return;
-  toolState.calibrationFactor = 100 / measuredMm;
 }
 
 // ---------------------------------------------------------------

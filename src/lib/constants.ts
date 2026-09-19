@@ -10,6 +10,15 @@ export const TOOL_HINTS: Record<Exclude<Tool, null>, string> = {
   'vp-place': 'Clic para colocar el punto de fuga',
   'vp-ray': 'Clic para añadir una línea desde el punto de fuga',
 };
+export const TOOL_NAMES: Record<Exclude<Tool, null>, string> = {
+  'measure': 'Medir',
+  'line-h': 'Línea H',
+  'line-v': 'Línea V',
+  'line-edge': 'Línea borde',
+  'line-custom': 'Línea',
+  'point': 'Punto',
+  'vp-place': 'Punto de fuga',
+  'vp-ray': 'Línea de fuga',
+};
 
-const BASE_PX_PER_MM = 96 / 25.4; // CSS reference pixel assumption (96dpi)
-export { BASE_PX_PER_MM };
+export const BASE_PX_PER_MM = 96 / 25.4; // CSS reference pixel assumption (96dpi)

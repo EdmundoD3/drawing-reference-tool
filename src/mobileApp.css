@@ -1,3 +1,21 @@
+.mobile-names-button {
+    display: block;
+}
+
+.mobile-names-button.active {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+.mobile-move-points-button {
+    display: block;
+}
+
+.mobile-move-points-button.active {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
 .mobile-panel-button {
     display: none;
 }
@@ -5,23 +23,31 @@
 @media (max-width: 700px) {
     .mobile-panel-button {
         display: block;
-
-        position: fixed;
-        z-index: 30;
-
-        right: 10px;
-        bottom: 10px;
-
+        min-width: 40px;
         min-height: 40px;
-        padding: 8px 12px;
-
-        background: var(--ink);
-        border: 1px solid var(--line);
-        color: var(--text);
-
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+        padding: 6px 9px;
     }
 }
+
+canvas.main-canvas {
+    touch-action: none;
+}
+
+.stage-toolbar {
+    height: 44px;
+    flex: 0 0 auto;
+    background: var(--ink);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+
 
 /* -------------------------------------------------------
    Mobile sidebar backdrop
@@ -29,6 +55,8 @@
 
 .sidebar-backdrop {
     display: none;
+    border: 0;
+    padding: 0;
 }
 
 @media (max-width: 700px) {
@@ -115,15 +143,20 @@
      ------------------------------------------------------- */
 
     .stage-toolbar {
-        height: 48px;
-        padding: 0 8px;
-        gap: 8px;
-
-        font-size: 11px;
+        height: auto;
+        min-height: 48px;
+        padding: 4px 6px;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
     }
 
     .zoomctl {
+        display: flex;
+        align-items: center;
         gap: 4px;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
     }
 
     .zoomctl button {
@@ -178,38 +211,6 @@
 
 
     /* -------------------------------------------------------
-     Calibration
-     ------------------------------------------------------- */
-
-    .calib-overlay {
-        left: 8px;
-        right: 8px;
-        bottom: 8px;
-
-        transform: none;
-
-        padding: 12px;
-    }
-
-    .calib-controls {
-        width: 100%;
-        max-width: none;
-
-        gap: 8px;
-    }
-
-    .calib-controls input {
-        width: 80px;
-        min-height: 40px;
-    }
-
-    .calib-controls button,
-    .calib-controls select {
-        min-height: 40px;
-    }
-
-
-    /* -------------------------------------------------------
      Touch-friendly controls
      ------------------------------------------------------- */
 
@@ -238,6 +239,10 @@
 
     .brand {
         padding: 16px;
+    }
+
+    .active-tool-button {
+        min-height: 40px;
     }
 }
 

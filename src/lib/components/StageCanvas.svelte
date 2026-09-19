@@ -1,4 +1,5 @@
 <script lang="ts">
+  // StageCanvas.svelte
   import { onMount } from "svelte";
   import {
     toolState,
@@ -27,11 +28,16 @@
     showRefNames,
   } from "../shared/stageCanvas.svelte";
   import StageToolbar from "./StageCanvas/StageToolbar.svelte";
-  import CalibOverlay from "./StageCanvas/CalibOverlay.svelte";
+  import CalibOverlay from "./calib/CalibOverlay.svelte";
   import CanvasWrap from "./StageCanvas/CanvasWrap.svelte";
   import EmptyOverlay from "./StageCanvas/EmptyOverlay.svelte";
   import FileInput from "./StageCanvas/FileInput.svelte";
-  import { onKeyDown, onMouseMove, onMouseUp, onWheel } from "../shared/canvasInteractions";
+  import {
+    onKeyDown,
+    onPointerMove,
+    onPointerUp,
+    onWheel,
+  } from "../shared/canvasInteractions";
 
   const viewport: ViewportFn = () => {
     if (!mainCanvas.value) return;
@@ -97,15 +103,17 @@
 
     mainCanvas.value.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
 
     return () => {
       ro.disconnect();
       mainCanvas.value?.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
     };
   });
 
@@ -243,7 +251,7 @@
 </script>
 
 <main class="stage">
-  <StageToolbar {fitNow} {viewport} />
+  <StageToolbar {fitNow} {viewport} {toggleRealSizeNow} />
 
   <div
     class="canvas-area"

@@ -1,0 +1,37 @@
+/* rotate.css */
+
+.rotate-handle-layer {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    touch-action: none;
+}
+
+.rotate-toggle.active {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.rotate-handle-layer line {
+    stroke: var(--amber);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+    opacity: 0.85;
+}
+
+.rotate-handle-layer circle {
+    fill: var(--amber);
+    stroke: var(--stage);
+    stroke-width: 2;
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+}
+
+.rotate-handle-layer circle:active {
+    cursor: grabbing;
+}

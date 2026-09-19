@@ -23,6 +23,7 @@ export const dragging = $state({
   startX: 0,
   startY: 0,
   moved: false,
+  handlePointerId: null as number | null,
 });
 
 export const showRefNames = $state({

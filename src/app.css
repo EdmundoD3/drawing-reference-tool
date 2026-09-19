@@ -105,11 +105,7 @@ input[type=file] { display: none; }
 
 /* Stage */
 .stage { display: flex; flex-direction: column; min-width: 0; }
-.stage-toolbar {
-  height: 44px; flex: 0 0 auto; background: var(--ink); border-bottom: 1px solid var(--line);
-  display: flex; align-items: center; padding: 0 14px; gap: 16px; font-family: var(--mono);
-  font-size: 12px; color: var(--text-dim);
-}
+
 .zoomctl { display: flex; align-items: center; gap: 6px; }
 .zoomctl button { padding: 4px 9px; }
 .zoomval { min-width: 46px; text-align: center; color: var(--text); }
@@ -130,24 +126,6 @@ canvas.main-canvas.tool-active { cursor: crosshair; }
 canvas.main-canvas.panning { cursor: grabbing; }
 canvas.main-canvas.hover-target { cursor: move; }
 
-.rotate-handle-layer {
-  grid-column: 2;
-  grid-row: 2;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-.rotate-handle-layer line { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: 0.85; }
-.rotate-handle-layer circle {
-  fill: var(--amber);
-  stroke: var(--stage);
-  stroke-width: 2;
-  pointer-events: auto;
-  cursor: grab;
-}
-.rotate-handle-layer circle:active { cursor: grabbing; }
-
 .empty-overlay { position: absolute; inset: 30px 0 0 30px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .empty-overlay .box {
   pointer-events: auto; text-align: center; color: var(--text-dim); border: 1.5px dashed var(--line);
@@ -155,12 +133,3 @@ canvas.main-canvas.hover-target { cursor: move; }
 }
 .empty-overlay .box:hover { border-color: var(--cyan); color: var(--text); }
 .empty-overlay .box strong { display: block; font-size: 15px; color: var(--text); margin-bottom: 6px; }
-
-.calib-overlay {
-  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
-  background: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px;
-  z-index: 5; box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-}
-.calib-box { height: 16px; background: var(--gold); border-radius: 2px; margin-bottom: 10px; }
-.calib-controls { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); flex-wrap: wrap; max-width: 520px; }
-.calib-controls input { width: 90px; }
