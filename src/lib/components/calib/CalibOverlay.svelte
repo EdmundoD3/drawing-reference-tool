@@ -1,19 +1,24 @@
-<!-- CalibOverlay.svelte -->
 <script lang="ts">
-    import { calibrate } from "../../calibration.svelte";
-  import { BASE_PX_PER_MM } from "../../constants";
+// CalibOverlay.svelte
+  import {
+    BASE_PX_PER_MM,
+    calibrate,
+    RULER_REFERENCE_MM,
+  } from "../../state/calibration.svelte";
   import type { ReapplyRealSizeIfActiveFn } from "../../interfaces/stageCanvas.interfaces";
-    import { toolState } from "../../state.svelte";
-  import { uiState } from "../../ui.svelte";
+  import { uiState } from "../../state/ui.svelte";
+
   interface Props {
     reapplyRealSizeIfActive: ReapplyRealSizeIfActiveFn;
   }
+
   let { reapplyRealSizeIfActive }: Props = $props();
 
   let calibInput = $state(60);
+
   function doCalibrate() {
     if (calibInput > 0) {
-      calibrate({measuredMm:calibInput,toolState});
+      calibrate(calibInput);
       reapplyRealSizeIfActive();
       uiState.showCalib = false;
     }
@@ -24,18 +29,22 @@
   <div class="calib-overlay">
     <div
       class="calib-box"
-      style={`width:${Math.round(BASE_PX_PER_MM * 60)}px`}
+      style={`width:${Math.round(BASE_PX_PER_MM * RULER_REFERENCE_MM)}px`}
     ></div>
+
     <div class="calib-controls">
-      <span
-        >Compara esta barra con una regla física y escribe lo que mide
-        realmente:</span
-      >
-      <input type="number" step="0.1" bind:value={calibInput} /><span>mm</span>
-      <button class="small primary" onclick={doCalibrate}>Calibrar</button>
-      <button class="small ghost" onclick={() => (uiState.showCalib = false)}
-        >Cerrar</button
-      >
+      <span>
+        Compara esta barra con una regla física y escribe lo que mide realmente:
+      </span>
+
+      <input type="number" step="0.1" bind:value={calibInput} />
+      <span>mm</span>
+
+      <button class="small primary" onclick={doCalibrate}> Calibrar </button>
+
+      <button class="small ghost" onclick={() => (uiState.showCalib = false)}>
+        Cerrar
+      </button>
     </div>
   </div>
 {/if}

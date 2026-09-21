@@ -4,4 +4,5 @@ export const uiState = $state({
     showCalibrationWarning: false,
     freeRotateMode: false,
     moveBothPoints: false,
+    sidebarOpen: false,
 });

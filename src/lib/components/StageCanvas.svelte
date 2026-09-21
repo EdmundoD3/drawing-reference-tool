@@ -1,13 +1,7 @@
 <script lang="ts">
   // StageCanvas.svelte
   import { onMount } from "svelte";
-  import {
-    toolState,
-    fitToScreen,
-    loadImageFile,
-    applyRealSizeZoom,
-    toggleRealSize,
-  } from "../state.svelte";
+  import { toolState } from "../state/state.svelte";
   import {
     drawGrid,
     drawGoldenRatio,
@@ -38,6 +32,10 @@
     onPointerUp,
     onWheel,
   } from "../shared/canvasInteractions";
+  import { fitToScreen } from "../canvas/view";
+  import { applyRealSizeZoom, toggleRealSize } from "../state/realSize.svelte";
+  import { loadImageFile } from "../state/image.svelte";
+  import { transformState } from "../state/transform.svelte";
 
   const viewport: ViewportFn = () => {
     if (!mainCanvas.value) return;
@@ -62,8 +60,9 @@
     const { w, h } = port;
     toggleRealSize(w, h);
   }
+
   export function reapplyRealSizeIfActive() {
-    if (toolState.realSizeActive) {
+    if (toolState.view.realSizeActive) {
       const port = viewport();
       if (!port) return;
       const { w, h } = port;
@@ -74,12 +73,14 @@
   // ---------------------------------------------------------------
   // Canvas sizing (device-pixel-ratio aware)
   // ---------------------------------------------------------------
+
   function sizeCanvas(c: HTMLCanvasElement) {
     const rect = c.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     c.width = Math.max(1, Math.round(rect.width * dpr));
     c.height = Math.max(1, Math.round(rect.height * dpr));
   }
+
   function resizeCanvases() {
     if (!rulerCanvas.top || !rulerCanvas.left || !mainCanvas.value) return;
 
@@ -120,6 +121,7 @@
   // ---------------------------------------------------------------
   // Reactive redraw — re-runs whenever any state read inside it changes
   // ---------------------------------------------------------------
+
   $effect(() => {
     if (!mainCanvas.value || !rulerCanvas.top || !rulerCanvas.left) return;
     redraw();
@@ -132,24 +134,46 @@
 
   function drawMain() {
     if (!mainCanvas.value) return;
-    const rect = mainCanvas.value.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const ctx = mainCanvas.value.getContext("2d")!;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, rect.width, rect.height);
-    ctx.fillStyle = "#0B121C";
-    ctx.fillRect(0, 0, rect.width, rect.height);
-    if (!toolState.oriented) return;
 
+    const rect = mainCanvas.value.getBoundingClientRect();
+
+    const dpr = window.devicePixelRatio || 1;
+
+    const ctx = mainCanvas.value.getContext("2d")!;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    ctx.fillStyle = "#0B121C";
+
+    ctx.fillRect(0, 0, rect.width, rect.height);
+
+    if (!transformState.oriented) return;
+
+    // -------------------------------------------------------------
+    // Imagen transformada
+    // -------------------------------------------------------------
     ctx.save();
-    ctx.translate(toolState.panX, toolState.panY);
-    ctx.scale(toolState.zoom, toolState.zoom);
-    ctx.imageSmoothingEnabled = toolState.zoom < 1;
-    ctx.drawImage(toolState.oriented, 0, 0);
+
+    ctx.translate(toolState.view.panX, toolState.view.panY);
+
+    ctx.scale(toolState.view.zoom, toolState.view.zoom);
+
+    ctx.imageSmoothingEnabled = toolState.view.zoom < 1;
+
+    ctx.drawImage(transformState.oriented, 0, 0);
+
     ctx.restore();
 
-    const { zoom, panX, panY, orientedW: W, orientedH: H } = toolState;
-    if (toolState.showGrid)
+    const { zoom, panX, panY } = toolState.view;
+
+    const { orientedW: W, orientedH: H } = transformState;
+
+    // -------------------------------------------------------------
+    // Grid
+    // -------------------------------------------------------------
+    if (toolState.tools.showGrid) {
       drawGrid(
         ctx,
         rect.width,
@@ -159,41 +183,58 @@
         zoom,
         panX,
         panY,
-        toolState.gridRows,
-        toolState.gridCols,
+        toolState.tools.gridRows,
+        toolState.tools.gridCols,
       );
-    drawGoldenRatio(ctx, toolState.goldenMode, W, H, zoom, panX, panY);
+    }
+
+    // -------------------------------------------------------------
+    // Golden ratio
+    // -------------------------------------------------------------
+    drawGoldenRatio(ctx, toolState.tools.goldenMode, W, H, zoom, panX, panY);
+
+    // -------------------------------------------------------------
+    // Reference objects
+    // -------------------------------------------------------------
     drawReferenceObjects(
       ctx,
-      toolState.refObjects,
-      W,
-      H,
+      toolState.tools.refObjects,
+      toolState.file.naturalW,
+      toolState.file.naturalH,
       zoom,
       panX,
       panY,
       showRefNames.value,
     );
+
+    // -------------------------------------------------------------
+    // Vanishing point
+    // -------------------------------------------------------------
     drawVanishingPoint(
       ctx,
-      toolState.vanishingPoint,
-      toolState.vpRays,
-      rect.width,
-      rect.height,
+      toolState.tools.vanishingPoint,
+      toolState.tools.vpRays,
+      W,
+      H,
       zoom,
       panX,
       panY,
     );
+
+    // -------------------------------------------------------------
+    // Measurements
+    // -------------------------------------------------------------
     drawMeasurements(
       ctx,
-      toolState.measurements,
-      toolState.pxPerUnit,
-      toolState.unit,
+      toolState.tools.measurements,
+      toolState.scale.pxPerUnit,
+      toolState.scale.unit,
       zoom,
       panX,
       panY,
-      toolState.pendingPoint,
-      toolState.hoverPoint,
-      toolState.activeTool === "measure",
+      toolState.tools.pendingPoint,
+      toolState.tools.hoverPoint,
+      toolState.tools.activeTool === "measure",
     );
   }
 
@@ -208,15 +249,15 @@
     topCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     topCtx.clearRect(0, 0, topRect.width, topRect.height);
 
-    if (toolState.oriented && toolState.showRulerTop) {
+    if (transformState.oriented && toolState.tools.showRulerTop) {
       drawRulerTop(
         topCtx,
         topRect.width,
         topRect.height,
-        toolState.orientedW,
-        toolState.pxPerUnit,
-        toolState.zoom,
-        toolState.panX,
+        transformState.orientedW,
+        toolState.scale.pxPerUnit,
+        toolState.view.zoom,
+        toolState.view.panX,
       );
     }
 
@@ -226,15 +267,15 @@
     leftCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     leftCtx.clearRect(0, 0, leftRect.width, leftRect.height);
 
-    if (toolState.oriented && toolState.showRulerLeft) {
+    if (transformState.oriented && toolState.tools.showRulerLeft) {
       drawRulerLeft(
         leftCtx,
         leftRect.width,
         leftRect.height,
-        toolState.orientedH,
-        toolState.pxPerUnit,
-        toolState.zoom,
-        toolState.panY,
+        transformState.orientedH,
+        toolState.scale.pxPerUnit,
+        toolState.view.zoom,
+        toolState.view.panY,
       );
     }
   }

@@ -1,41 +1,60 @@
 <script lang="ts">
+  import { setTool } from "../../canvas/tools";
+  import { setZoom } from "../../canvas/view";
   import { TOOL_NAMES } from "../../constants";
-  import { sidebarOpen } from "../../globalState.svelte";
   import type {
     FitNowFn,
     ViewportFn,
   } from "../../interfaces/stageCanvas.interfaces";
   import { coordsText, showRefNames } from "../../shared/stageCanvas.svelte";
-  import { setTool, setZoom, toolState } from "../../state.svelte";
-  import { uiState } from "../../ui.svelte";
+  import { toolState } from "../../state/state.svelte";
+    import { transformState } from "../../state/transform.svelte";
+  import { uiState } from "../../state/ui.svelte";
   import CalibWarningBtn from "../calib/CalibWarningBtn.svelte";
   import RotateToggle from "./RotateToggle.svelte";
+
   interface Props {
     fitNow: FitNowFn;
     viewport: ViewportFn;
     toggleRealSizeNow: () => void;
   }
+
   let { fitNow, viewport, toggleRealSizeNow }: Props = $props();
 
   function zoomInClick() {
     const port = viewport();
     if (!port) return;
+
     const { w, h } = port;
-    setZoom(toolState.zoom * 1.25, w / 2, h / 2);
+
+    setZoom(
+      toolState.view.zoom * 1.25,
+      w / 2,
+      h / 2,
+    );
   }
+
   function zoomOutClick() {
     const port = viewport();
     if (!port) return;
+
     const { w, h } = port;
-    setZoom(toolState.zoom / 1.25, w / 2, h / 2);
+
+    setZoom(
+      toolState.view.zoom / 1.25,
+      w / 2,
+      h / 2,
+    );
   }
 
   function disableActiveTool() {
     setTool(null);
   }
+
   function toggleRefNames() {
     showRefNames.value = !showRefNames.value;
   }
+
   function toggleMoveBothPoints() {
     uiState.moveBothPoints = !uiState.moveBothPoints;
   }
@@ -45,24 +64,44 @@
   <div class="zoomctl">
     <button
       class="small"
-      disabled={!toolState.oriented || toolState.realSizeActive}
-      onclick={zoomOutClick}>−</button
+      disabled={
+        !transformState.oriented ||
+        toolState.view.realSizeActive
+      }
+      onclick={zoomOutClick}
     >
-    <span class="zoomval">{Math.round(toolState.zoom * 100)}%</span>
+      −
+    </button>
+
+    <span class="zoomval">
+      {Math.round(toolState.view.zoom * 100)}%
+    </span>
+
     <button
       class="small"
-      disabled={!toolState.oriented || toolState.realSizeActive}
-      onclick={zoomInClick}>+</button
+      disabled={
+        !transformState.oriented ||
+        toolState.view.realSizeActive
+      }
+      onclick={zoomInClick}
     >
+      +
+    </button>
+
     <button
       class="small"
-      disabled={!toolState.oriented || toolState.realSizeActive}
+      disabled={
+        !transformState.oriented ||
+        toolState.view.realSizeActive
+      }
       onclick={fitNow}
       title="Encajar la imagen completa en el área visible"
     >
       Encajar
     </button>
-    <RotateToggle></RotateToggle>
+
+    <RotateToggle />
+
     <button
       class="small mobile-names-button"
       class:active={showRefNames.value}
@@ -71,6 +110,7 @@
     >
       Nombres
     </button>
+
     <button
       class="small mobile-move-points-button"
       class:active={uiState.moveBothPoints}
@@ -80,23 +120,31 @@
     >
       2 puntos
     </button>
+
     <CalibWarningBtn onToggle={toggleRealSizeNow} />
 
     <button
       class="mobile-panel-button"
-      aria-label={sidebarOpen.value
-        ? "Cerrar herramientas"
-        : "Abrir herramientas"}
-      onclick={() => (sidebarOpen.value = !sidebarOpen.value)}
+      aria-label={
+        uiState.sidebarOpen
+          ? "Cerrar herramientas"
+          : "Abrir herramientas"
+      }
+      onclick={() => (uiState.sidebarOpen = !uiState.sidebarOpen)}
     >
-      {sidebarOpen.value ? "×" : "☰"}
+      {uiState.sidebarOpen ? "×" : "☰"}
     </button>
   </div>
-  {#if toolState.activeTool != null}
-    <button class="active-tool-button" onclick={disableActiveTool}>
-      {TOOL_NAMES[toolState.activeTool]} ×
+
+  {#if toolState.tools.activeTool != null}
+    <button
+      class="active-tool-button"
+      onclick={disableActiveTool}
+    >
+      {TOOL_NAMES[toolState.tools.activeTool]} ×
     </button>
   {/if}
+
   <div class="coords">
     <span>X: <b>{coordsText.x}</b></span>
     <span>Y: <b>{coordsText.y}</b></span>

@@ -1,4 +1,6 @@
 <script lang="ts">
+// CanvasWrap.svelte
+  import { imageCenterScreen } from "../../canvas/coordinates";
   import {
     onHandlePointerDown,
     onPointerDown,
@@ -12,18 +14,29 @@
     rulerCanvas,
     showRefNames,
   } from "../../shared/stageCanvas.svelte";
-  import { imageCenterScreen, toolState } from "../../state.svelte";
-  import { uiState } from "../../ui.svelte";
+
+  import { toolState } from "../../state/state.svelte";
+    import { transformState } from "../../state/transform.svelte";
+  import { uiState } from "../../state/ui.svelte";
+
   const RADIUS_SCALE = 0.5;
 
   let handlePos = $derived.by(() => {
     const c = imageCenterScreen();
-    // radio de una esquina de la imagen hacia el centro
+
+    // Radio desde una esquina de la imagen hacia el centro
     const radius =
-      (Math.max(toolState.orientedW, toolState.orientedH) / 2) *
-      toolState.zoom *
+      (Math.max(
+        transformState.orientedW,
+        transformState.orientedH,
+      ) / 2) *
+      toolState.view.zoom *
       RADIUS_SCALE;
-    const ang = -Math.PI / 2 + (toolState.freeAngle * Math.PI) / 180;
+
+    const ang =
+  -Math.PI / 2 +
+  (transformState.rotation * Math.PI) / 180;
+
     return {
       cx: c.x,
       cy: c.y,
@@ -47,18 +60,27 @@
 
 <div class="canvas-wrap">
   <div class="corner"></div>
-  <canvas class="ruler-top" bind:this={rulerCanvas.top}></canvas>
-  <canvas class="ruler-left" bind:this={rulerCanvas.left}></canvas>
+
+  <canvas
+    class="ruler-top"
+    bind:this={rulerCanvas.top}
+  ></canvas>
+
+  <canvas
+    class="ruler-left"
+    bind:this={rulerCanvas.left}
+  ></canvas>
+
   <canvas
     class="main-canvas"
-    class:tool-active={toolState.activeTool !== null}
+    class:tool-active={toolState.tools.activeTool !== null}
     class:panning={isPanning.value}
     class:hover-target={hoverTarget.value}
     bind:this={mainCanvas.value}
     onpointerdown={onPointerDown}
   ></canvas>
 
-  {#if uiState.freeRotateMode && toolState.oriented}
+  {#if uiState.freeRotateMode && transformState.oriented}
     <svg class="rotate-handle-layer">
       <line
         x1={handlePos.cx}
@@ -66,19 +88,21 @@
         x2={handlePos.x}
         y2={handlePos.y}
       />
+
       <circle
         cx={handlePos.x}
         cy={handlePos.y}
         r="9"
         role="slider"
         aria-label="Rotar libremente"
-        aria-valuenow={Math.round(toolState.freeAngle)}
+        aria-valuenow={Math.round(transformState.rotation)}
         tabindex="0"
         onpointerdown={onHandlePointerDown}
       />
     </svg>
   {/if}
 </div>
+
 <svelte:window
   onkeydown={onKeyDown}
   onkeyup={onKeyUp}

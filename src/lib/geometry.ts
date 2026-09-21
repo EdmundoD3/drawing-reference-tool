@@ -100,10 +100,6 @@ export function toScreen(p: Point, zoom: number, panX: number, panY: number): Po
   return { x: p.x * zoom + panX, y: p.y * zoom + panY };
 }
 
-export function screenToImg(mx: number, my: number, zoom: number, panX: number, panY: number): Point {
-  return { x: (mx - panX) / zoom, y: (my - panY) / zoom };
-}
-
 /** Type-appropriate readout for a reference line/point: only the axis that matters for h/v lines. */
 export function refObjectInfo(o: RefObject, pxPerUnit: number, unit: string): string[] {
   if (o.type === 'point') {

@@ -21,4 +21,3 @@ export const TOOL_NAMES: Record<Exclude<Tool, null>, string> = {
   'vp-ray': 'Línea de fuga',
 };
 
-export const BASE_PX_PER_MM = 96 / 25.4; // CSS reference pixel assumption (96dpi)

@@ -1,22 +1,19 @@
 <script lang="ts">
-    import { clearFreeAngle, toolState } from "../../state.svelte";
-    import { uiState } from "../../ui.svelte";
+  import { transformState } from "../../state/transform.svelte";
+  import { uiState } from "../../state/ui.svelte";
 
-    function toggleFreeRotate() {
-        uiState.freeRotateMode = !uiState.freeRotateMode;
-        // if (!uiState.freeRotateMode) clearFreeAngle();
-        // Lo desactive por que me di cuenta que tal vez no todos quieran limpiar
-        // puede que solo quieran bloquear la rotacion
-    }
+  function toggleFreeRotate() {
+    uiState.freeRotateMode = !uiState.freeRotateMode;
+  }
 </script>
 
 <button
-    class="small rotate-toggle"
-    class:active={uiState.freeRotateMode}
-    disabled={!toolState.oriented}
-    aria-label="Rotación libre"
-    title="Rotación libre"
-    onclick={toggleFreeRotate}
+  class="small rotate-toggle"
+  class:active={uiState.freeRotateMode}
+  disabled={!transformState.oriented}
+  aria-label="Rotación libre"
+  title="Rotación libre"
+  onclick={toggleFreeRotate}
 >
-    ⟳
+  ⟳
 </button>

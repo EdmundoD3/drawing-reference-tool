@@ -1,14 +1,17 @@
 <script lang="ts">
+  // LinesPanel.svelte
   import { tick } from "svelte";
+
   import {
-    toolState,
-    setTool,
     deleteRefObject,
     renameRefObject,
-    toggleRefObjectLock,
     setRefObjectColor,
-  } from "../state.svelte";
+    setTool,
+  } from "../canvas/tools";
+  import { toggleRefObjectLock } from "../canvas/dragging";
   import { refObjectInfo } from "../geometry";
+  import { toolState } from "../state/state.svelte";
+  import { transformState } from "../state/transform.svelte";
 
   let myInput = $state<HTMLInputElement | null>(null);
 
@@ -55,49 +58,69 @@
 
 <section class="panel">
   <h2>Líneas de referencia</h2>
-  <span>usa ctrl para mover ambos puntos, usa shift (flecha arriba) para ver los nombres</span>
+
+  <span>
+    usa ctrl para mover ambos puntos, usa shift (flecha arriba) para ver los
+    nombres
+  </span>
+
   <div class="btnrow">
     <button
       class="small toolbtn"
-      class:active={toolState.activeTool === "line-h"}
-      disabled={!toolState.oriented}
-      onclick={() => setTool("line-h")}>Horizontal</button
+      class:active={toolState.tools.activeTool === "line-h"}
+      disabled={!transformState.oriented}
+      onclick={() => setTool("line-h")}
     >
+      Horizontal
+    </button>
+
     <button
       class="small toolbtn"
-      class:active={toolState.activeTool === "line-v"}
-      disabled={!toolState.oriented}
-      onclick={() => setTool("line-v")}>Vertical</button
+      class:active={toolState.tools.activeTool === "line-v"}
+      disabled={!transformState.oriented}
+      onclick={() => setTool("line-v")}
     >
+      Vertical
+    </button>
   </div>
+
   <div class="btnrow" style="margin-top:6px;">
     <button
       class="small toolbtn"
-      class:active={toolState.activeTool === "line-edge"}
-      disabled={!toolState.oriented}
-      onclick={() => setTool("line-edge")}>Extremo a extremo</button
+      class:active={toolState.tools.activeTool === "line-edge"}
+      disabled={!transformState.oriented}
+      onclick={() => setTool("line-edge")}
     >
+      Extremo a extremo
+    </button>
+
     <button
       class="small toolbtn"
-      class:active={toolState.activeTool === "line-custom"}
-      disabled={!toolState.oriented}
-      onclick={() => setTool("line-custom")}>Personalizada</button
+      class:active={toolState.tools.activeTool === "line-custom"}
+      disabled={!transformState.oriented}
+      onclick={() => setTool("line-custom")}
     >
+      Personalizada
+    </button>
   </div>
+
   <div class="btnrow" style="margin-top:6px;">
     <button
       class="small toolbtn"
       style="width:100%;"
-      class:active={toolState.activeTool === "point"}
-      disabled={!toolState.oriented}
-      onclick={() => setTool("point")}>+ Punto</button
+      class:active={toolState.tools.activeTool === "point"}
+      disabled={!transformState.oriented}
+      onclick={() => setTool("point")}
     >
+      + Punto
+    </button>
   </div>
+
   <div class="list">
-    {#if toolState.refObjects.length === 0}
+    {#if toolState.tools.refObjects.length === 0}
       <div class="empty-hint">Sin líneas ni puntos todavía.</div>
     {:else}
-      {#each toolState.refObjects as o (`refObj-${o.id}`)}
+      {#each toolState.tools.refObjects as o (`refObj-${o.id}`)}
         <div class="list-item">
           <div class="top">
             <span class="name-area">
@@ -136,6 +159,7 @@
                 </button>
               {/if}
             </span>
+
             <span>
               <button
                 title="Renombrar"
@@ -143,22 +167,30 @@
               >
                 ✎
               </button>
+
               <button
                 title={o.locked ? "Desbloquear" : "Bloquear"}
                 onclick={() => toggleRefObjectLock(o.id)}
               >
                 {o.locked ? "🔒" : "🔓"}
               </button>
+
               <button
                 title="Eliminar"
                 onclick={() => {
-                  if (editingId === o.id) return cancelRename();
+                  if (editingId === o.id) {
+                    return cancelRename();
+                  }
+
                   deleteRefObject(o.id);
-                }}>×</button
+                }}
               >
+                ×
+              </button>
             </span>
           </div>
-          {#each refObjectInfo(o, toolState.pxPerUnit, toolState.unit) as info, index (`refObjInfo-${o.id}-${index}`)}
+
+          {#each refObjectInfo(o, toolState.scale.pxPerUnit, toolState.scale.unit) as info, index (`refObjInfo-${o.id}-${index}`)}
             <span class="val">{info}</span>
           {/each}
         </div>

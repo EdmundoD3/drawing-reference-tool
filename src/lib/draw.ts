@@ -1,4 +1,7 @@
+import { transformPoint } from './canvas/coordinates';
 import { buildGoldenSpiralArcs, clipRay, fmt, measureDist, niceStep, toScreen } from './geometry';
+import { toolState } from './state/state.svelte';
+import { transformState } from './state/transform.svelte';
 import type { GoldenMode, Measurement, Point, RefObject, VanishingRay } from './types';
 
 const FONT = '-apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
@@ -148,7 +151,22 @@ export function drawReferenceObjects(
   panY: number,
   showNames = false,
 ) {
-  const ts = (p: Point) => toScreen(p, zoom, panX, panY);
+  // W/H son las dimensiones ORIGINALES de la imagen.
+  const transform = (p: Point) =>
+    transformPoint(
+      p,
+      transformState,
+      W,
+      H,
+    );
+
+  const ts = (p: Point) =>
+    toScreen(
+      transform(p),
+      zoom,
+      panX,
+      panY,
+    );
 
   objects.forEach((o) => {
     // -------------------------------------------------------------
@@ -157,9 +175,13 @@ export function drawReferenceObjects(
     if (o.type === 'point') {
       drawPointMarker(
         ctx,
-        ts({ x: o.ax, y: o.ay }),
+        ts({
+          x: o.ax,
+          y: o.ay,
+        }),
         o.color,
       );
+
       return;
     }
 
@@ -167,19 +189,46 @@ export function drawReferenceObjects(
     // Línea personalizada: segmento A → B
     // -------------------------------------------------------------
     if (o.type === 'custom') {
-      const a = ts({ x: o.ax, y: o.ay });
-      const b = ts({ x: o.bx, y: o.by });
+      const a = ts({
+        x: o.ax,
+        y: o.ay,
+      });
 
-      drawRefLine(ctx, a.x, a.y, b.x, b.y, false, o.color,);
+      const b = ts({
+        x: o.bx,
+        y: o.by,
+      });
 
-      drawPointMarker(ctx, a, o.color);
-      drawPointMarker(ctx, b, o.color);
+      drawRefLine(
+        ctx,
+        a.x,
+        a.y,
+        b.x,
+        b.y,
+        false,
+        o.color,
+      );
+
+      drawPointMarker(
+        ctx,
+        a,
+        o.color,
+      );
+
+      drawPointMarker(
+        ctx,
+        b,
+        o.color,
+      );
 
       return;
     }
 
     // -------------------------------------------------------------
     // Línea horizontal / vertical / extremo a extremo
+    //
+    // Primero se recorta en el espacio ORIGINAL.
+    // Después se transforma todo el segmento.
     // -------------------------------------------------------------
     let dx: number;
     let dy: number;
@@ -217,10 +266,25 @@ export function drawReferenceObjects(
 
     if (!c) return;
 
-    const a = ts({ x: c.x1, y: c.y1 });
-    const b = ts({ x: c.x2, y: c.y2 });
+    const a = ts({
+      x: c.x1,
+      y: c.y1,
+    });
 
-    drawRefLine(ctx, a.x, a.y, b.x, b.y, false, o.color);
+    const b = ts({
+      x: c.x2,
+      y: c.y2,
+    });
+
+    drawRefLine(
+      ctx,
+      a.x,
+      a.y,
+      b.x,
+      b.y,
+      false,
+      o.color,
+    );
 
     // -------------------------------------------------------------
     // Puntos de control / ancla
@@ -231,7 +295,11 @@ export function drawReferenceObjects(
         y: o.ay,
       });
 
-      drawPointMarker(ctx, anchor, o.color);
+      drawPointMarker(
+        ctx,
+        anchor,
+        o.color,
+      );
     }
 
     if (o.type === 'edge') {
@@ -245,13 +313,28 @@ export function drawReferenceObjects(
         y: o.by,
       });
 
-      drawPointMarker(ctx, p1, o.color);
-      drawPointMarker(ctx, p2, o.color);
+      drawPointMarker(
+        ctx,
+        p1,
+        o.color,
+      );
+
+      drawPointMarker(
+        ctx,
+        p2,
+        o.color,
+      );
     }
   });
+
+  // -------------------------------------------------------------
+  // Nombres
+  // -------------------------------------------------------------
   if (showNames) {
     objects.forEach((o) => {
-      const p = ts(refLabelPoint(o));
+      const p = ts(
+        refLabelPoint(o),
+      );
 
       drawRefName(
         ctx,
@@ -264,67 +347,256 @@ export function drawReferenceObjects(
   }
 }
 
+
 export function drawVanishingPoint(
-  ctx: CanvasRenderingContext2D, vp: Point | null, rays: VanishingRay[],
-  rectW: number, rectH: number, zoom: number, panX: number, panY: number
+  ctx: CanvasRenderingContext2D,
+  vp: Point | null,
+  rays: VanishingRay[],
+  W: number,
+  H: number,
+  zoom: number,
+  panX: number,
+  panY: number,
 ) {
   if (!vp) return;
-  const ts = (p: Point) => toScreen(p, zoom, panX, panY);
-  const vs = ts(vp);
+
+  // Los puntos se almacenan en coordenadas ORIGINALES.
+  // Primero los transformamos a coordenadas ORIENTED.
+  const transform = (p: Point) =>
+    transformPoint(
+      p,
+      transformState,
+      toolState.file.naturalW,
+      toolState.file.naturalH,
+    );
+
+  // Después convertimos de ORIENTED a pantalla.
+  const ts = (p: Point) =>
+    toScreen(
+      p,
+      zoom,
+      panX,
+      panY,
+    );
+
+  const vo = transform(vp);
+  const vs = ts(vo);
 
   rays.forEach((r) => {
-    const rp = ts(r);
-    const c = clipRay(vs.x, vs.y, rp.x - vs.x, rp.y - vs.y, 0, rectW, 0, rectH);
-    if (c) drawRefLine(ctx, c.x1, c.y1, c.x2, c.y2, true);
+    const ro = transform(r);
+    const rp = ts(ro);
+
+    // El clipping se hace en coordenadas ORIENTED,
+    // antes de aplicar zoom y pan.
+    const c = clipRay(
+      vo.x,
+      vo.y,
+      ro.x - vo.x,
+      ro.y - vo.y,
+      0,
+      W,
+      0,
+      H,
+    );
+
+    if (c) {
+      const a = ts({
+        x: c.x1,
+        y: c.y1,
+      });
+
+      const b = ts({
+        x: c.x2,
+        y: c.y2,
+      });
+
+      drawRefLine(
+        ctx,
+        a.x,
+        a.y,
+        b.x,
+        b.y,
+        true,
+      );
+    }
+
     ctx.save();
-    ctx.fillStyle = 'rgba(227,139,41,0.9)';
-    ctx.beginPath(); ctx.arc(rp.x, rp.y, 3, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle =
+      'rgba(227,139,41,0.9)';
+
+    ctx.beginPath();
+
+    ctx.arc(
+      rp.x,
+      rp.y,
+      3,
+      0,
+      Math.PI * 2,
+    );
+
+    ctx.fill();
+
     ctx.restore();
   });
 
   ctx.save();
+
   ctx.strokeStyle = '#E38B29';
   ctx.lineWidth = 1.8;
+
   ctx.beginPath();
-  ctx.arc(vs.x, vs.y, 8, 0, Math.PI * 2);
+
+  ctx.arc(
+    vs.x,
+    vs.y,
+    8,
+    0,
+    Math.PI * 2,
+  );
+
   ctx.stroke();
+
   ctx.beginPath();
-  ctx.moveTo(vs.x - 13, vs.y); ctx.lineTo(vs.x + 13, vs.y);
-  ctx.moveTo(vs.x, vs.y - 13); ctx.lineTo(vs.x, vs.y + 13);
+
+  ctx.moveTo(
+    vs.x - 13,
+    vs.y,
+  );
+
+  ctx.lineTo(
+    vs.x + 13,
+    vs.y,
+  );
+
+  ctx.moveTo(
+    vs.x,
+    vs.y - 13,
+  );
+
+  ctx.lineTo(
+    vs.x,
+    vs.y + 13,
+  );
+
   ctx.stroke();
+
   ctx.restore();
 }
 
+
+
 export function drawMeasurements(
-  ctx: CanvasRenderingContext2D, measurements: Measurement[], pxPerUnit: number, unit: string,
-  zoom: number, panX: number, panY: number,
-  pendingPoint: Point | null, hoverPoint: Point | null, pendingIsMeasure: boolean
+  ctx: CanvasRenderingContext2D,
+  measurements: Measurement[],
+  pxPerUnit: number,
+  unit: string,
+  zoom: number,
+  panX: number,
+  panY: number,
+  pendingPoint: Point | null,
+  hoverPoint: Point | null,
+  pendingIsMeasure: boolean,
 ) {
-  const ts = (p: Point) => toScreen(p, zoom, panX, panY);
+  const transform = (p: Point) =>
+    transformPoint(
+      p,
+      transformState,
+      toolState.file.naturalW,
+      toolState.file.naturalH,
+    );
+
+  const ts = (p: Point) =>
+    toScreen(
+      transform(p),
+      zoom,
+      panX,
+      panY,
+    );
+
   ctx.save();
   ctx.font = '11.5px ' + FONT;
+
   measurements.forEach((m) => {
-    const a = ts({ x: m.ax, y: m.ay }), b = ts({ x: m.bx, y: m.by });
-    const d = measureDist(m, pxPerUnit);
-    drawMeasureLine(ctx, a, b, fmt(d.total) + ' ' + unit);
+    const a = ts({
+      x: m.ax,
+      y: m.ay,
+    });
+
+    const b = ts({
+      x: m.bx,
+      y: m.by,
+    });
+
+    // La distancia se calcula en coordenadas originales.
+    const d = measureDist(
+      m,
+      pxPerUnit,
+    );
+
+    drawMeasureLine(
+      ctx,
+      a,
+      b,
+      fmt(d.total) + ' ' + unit,
+    );
   });
+
   if (pendingPoint) {
-    const color = pendingIsMeasure ? '#E38B29' : '#6FB7C9';
+    const color =
+      pendingIsMeasure
+        ? '#E38B29'
+        : '#6FB7C9';
+
     const a = ts(pendingPoint);
-    dot(ctx, a, color);
+
+    dot(
+      ctx,
+      a,
+      color,
+    );
+
     if (hoverPoint) {
       const b = ts(hoverPoint);
+
       if (pendingIsMeasure) {
-        const dx = hoverPoint.x - pendingPoint.x, dy = hoverPoint.y - pendingPoint.y;
-        const total = Math.hypot(dx, dy) / pxPerUnit;
-        drawMeasureLine(ctx, a, b, fmt(total) + ' ' + unit, true);
+        // La distancia también permanece en
+        // coordenadas originales.
+        const dx =
+          hoverPoint.x -
+          pendingPoint.x;
+
+        const dy =
+          hoverPoint.y -
+          pendingPoint.y;
+
+        const total =
+          Math.hypot(dx, dy) /
+          pxPerUnit;
+
+        drawMeasureLine(
+          ctx,
+          a,
+          b,
+          fmt(total) + ' ' + unit,
+          true,
+        );
       } else {
-        drawRefLine(ctx, a.x, a.y, b.x, b.y, true);
+        drawRefLine(
+          ctx,
+          a.x,
+          a.y,
+          b.x,
+          b.y,
+          true,
+        );
       }
     }
   }
+
   ctx.restore();
 }
+
 
 export function drawRulerTop(
   ctx: CanvasRenderingContext2D, rectW: number, rectH: number,

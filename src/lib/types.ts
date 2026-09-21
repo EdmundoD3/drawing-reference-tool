@@ -57,26 +57,77 @@ export interface Arc {
   startAngle: number; endAngle: number; ccw: boolean;
 }
 
+type FileState = {
+    image: HTMLImageElement | null;
+    naturalW: number;
+    naturalH: number;
+    fileName: string;
+};
+
+type ScaleState = {
+    scaleDim: ScaleDim;
+    scaleValue: number;
+    unit: Unit;
+    pxPerUnit: number;
+};
+
+type ViewState = {
+    zoom: number;
+    panX: number;
+    panY: number;
+    realSizeActive: boolean;
+    savedZoom: number;
+    savedPanX: number;
+    savedPanY: number;
+};
+
+type ToolsState = {
+    showGrid: boolean;
+    showRulerTop: boolean;
+    showRulerLeft: boolean;
+    gridRows: number;
+    gridCols: number;
+    goldenMode: GoldenMode;
+    activeTool: Tool;
+    pendingPoint: Point | null;
+    hoverPoint: Point | null;
+    measurements: Measurement[];
+    refObjects: RefObject[];
+    typeCounters: Record<RefObjectType, number>;
+    vanishingPoint: Point | null;
+    vpRays: VanishingRay[];
+    nextId: number;
+};
+
+export type ToolState = {
+    file: FileState;
+    scale: ScaleState;
+    view: ViewState;
+    tools: ToolsState;
+};
+
 export interface ProjectFile {
   version: 1;
+
   image: string;
-  rotation: number;
-  freeAngle?: number;
-  flipH: boolean;
-  flipV: boolean;
+
   scaleDim: ScaleDim;
   scaleValue: number;
   unit: Unit;
+
   gridRows: number;
   gridCols: number;
   showGrid: boolean;
   showRulerTop: boolean;
   showRulerLeft: boolean;
+
   goldenMode: GoldenMode;
-  calibrationFactor: number;
+
   measurements: Measurement[];
   refObjects: RefObject[];
+
   vanishingPoint: Point | null;
   vpRays: VanishingRay[];
+
   nextId: number;
 }

@@ -10,13 +10,13 @@
   import RealSizePanel from "./lib/components/calib/RealSizePanel.svelte";
   import ProjectPanel from "./lib/components/ProjectPanel.svelte";
   import StageCanvas from "./lib/components/StageCanvas.svelte";
-  import { sidebarOpen } from "./lib/globalState.svelte";
+  import { uiState } from "./lib/state/ui.svelte";
 
   let stage: ReturnType<typeof StageCanvas> | undefined = $state();
 </script>
 
 <div class="app">
-  <aside class:open={sidebarOpen.value} class="sidebar">
+  <aside class:open={uiState.sidebarOpen} class="sidebar">
     <div class="brand">
       <div class="mark">REF · 001</div>
       <h1>Herramienta de referencias</h1>
@@ -24,21 +24,40 @@
     </div>
 
     <ImagePanel onLoaded={() => stage?.fitNow()} />
-    <ScalePanel onScaleChange={() => stage?.reapplyRealSizeIfActive()} />
-    <TransformPanel onAfterTransform={() => stage?.fitNow()} />
+
+    <ScalePanel
+      onScaleChange={() => stage?.reapplyRealSizeIfActive()}
+    />
+
+    <TransformPanel
+      onAfterTransform={() => stage?.fitNow()}
+    />
+
     <ReferencesPanel />
+
     <!-- <GoldenRatioPanel /> -->
+
     <MeasurementsPanel />
+
     <LinesPanel />
+
     <VanishingPointPanel />
-    <RealSizePanel onToggle={() => stage?.toggleRealSizeNow()} />
-    <ProjectPanel onLoaded={() => stage?.fitNow()} />
+
+    <RealSizePanel
+      onToggle={() => stage?.toggleRealSizeNow()}
+    />
+
+    <ProjectPanel
+      onLoaded={() => stage?.fitNow()}
+    />
   </aside>
-<button
-  class="sidebar-backdrop"
-  class:visible={sidebarOpen.value}
-  aria-label="Cerrar menú"
-  onclick={() => (sidebarOpen.value = false)}
-></button>
+
+  <button
+    class="sidebar-backdrop"
+    class:visible={uiState.sidebarOpen}
+    aria-label="Cerrar menú"
+    onclick={() => (uiState.sidebarOpen = false)}
+  ></button>
+
   <StageCanvas bind:this={stage} />
 </div>

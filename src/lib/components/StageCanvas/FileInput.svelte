@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FitNowFn } from "../../interfaces/stageCanvas.interfaces";
-  import { loadImageFile } from "../../state.svelte";
   import { fileInput } from "../../shared/stageCanvas.svelte";
+    import { loadImageFile } from "../../state/image.svelte";
 
   interface Props {
     fitNow: FitNowFn;

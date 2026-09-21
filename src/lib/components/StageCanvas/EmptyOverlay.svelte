@@ -1,9 +1,10 @@
 <script lang="ts">
+// EmptyOverlay.svelte
   import { fileInput } from "../../shared/stageCanvas.svelte";
-  import { toolState } from "../../state.svelte";
+  import { transformState } from "../../state/transform.svelte";
 </script>
 
-{#if !toolState.oriented}
+{#if !transformState.oriented}
   <div class="empty-overlay">
     <button type="button" class="box" onclick={() => fileInput.value?.click()}>
       <strong>Sin imagen cargada</strong>

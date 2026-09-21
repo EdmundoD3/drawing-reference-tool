@@ -1,10 +1,13 @@
 <script lang="ts">
   // CalibWarningBtn.svelte
-  import { toolState } from "../../state.svelte";
-  import { uiState } from "../../ui.svelte";
+  import { calibrationState } from "../../state/calibration.svelte";
+  import { toolState } from "../../state/state.svelte";
+  import { uiState } from "../../state/ui.svelte";
+
   interface Props {
     onToggle: () => void;
   }
+
   let { onToggle }: Props = $props();
 
   function showCalibrationWarning() {
@@ -12,10 +15,10 @@
   }
 </script>
 
-{#if toolState.isCalibrated}
+{#if calibrationState.isCalibrated}
   <button
     class="small"
-    class:active={toolState.realSizeActive}
+    class:active={toolState.view.realSizeActive}
     aria-label="Mostrar tamaño real"
     title="Mostrar tamaño real en pantalla"
     onclick={onToggle}
@@ -23,7 +26,8 @@
     1:1
   </button>
 {/if}
-{#if !toolState.isCalibrated}
+
+{#if !calibrationState.isCalibrated}
   <button
     class="small calibration-warning"
     aria-label="Pantalla sin calibrar"
@@ -61,7 +65,6 @@
     </div>
   {/if}
 {/if}
-
 <style>
   .calibration-warning-popup {
     position: fixed;
