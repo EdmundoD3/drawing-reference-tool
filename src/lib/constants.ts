@@ -1,5 +1,7 @@
 import type { Tool } from "./types";
 
+export const APP_NAME = "Grid Tool";
+
 export const TOOL_HINTS: Record<Exclude<Tool, null>, string> = {
   'measure': 'Clic para el punto A, luego el punto B',
   'line-h': 'Clic para colocar una línea horizontal',

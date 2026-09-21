@@ -1,4 +1,5 @@
 // project.ts
+import { APP_NAME } from './constants';
 import {
   drawGoldenRatio,
   drawGrid,
@@ -309,8 +310,17 @@ export function exportPng() {
       document.createElement('a');
 
     a.href = url;
+
+    const dot =
+      toolState.file.originalFileName.lastIndexOf('.');
+
+    const baseName =
+      dot > 0
+        ? toolState.file.originalFileName.slice(0, dot)
+        : toolState.file.originalFileName;
+
     a.download =
-      'referencia-exportada.png';
+      `${baseName} · ${APP_NAME}.png`;
 
     a.click();
 
