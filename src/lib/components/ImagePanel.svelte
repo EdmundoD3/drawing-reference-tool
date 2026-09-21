@@ -1,5 +1,6 @@
 <script lang="ts">
   import { loadImageFile } from "../state/image.svelte";
+  import { loadProject } from "../project";
   import { toolState } from "../state/state.svelte";
 
   interface Props {
@@ -11,11 +12,21 @@
   let fileInput: HTMLInputElement;
 
   function onChange(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
+    const file =
+      (e.target as HTMLInputElement).files?.[0];
 
-    if (file) {
+    if (!file) return;
+
+    const isProject =
+      file.name.toLowerCase().endsWith(".json");
+
+    if (isProject) {
+      loadProject(file, onLoaded);
+    } else {
       loadImageFile(file, onLoaded);
     }
+
+    fileInput.value = "";
   }
 </script>
 
@@ -27,7 +38,7 @@
       class="small"
       onclick={() => fileInput.click()}
     >
-      Cargar imagen
+      Abrir
     </button>
   </div>
 
@@ -40,7 +51,7 @@
   <input
     bind:this={fileInput}
     type="file"
-    accept="image/png,image/jpeg,image/webp"
+    accept="image/png,image/jpeg,image/webp,application/json,.json"
     onchange={onChange}
   />
 </section>

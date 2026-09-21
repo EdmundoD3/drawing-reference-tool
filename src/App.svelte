@@ -25,13 +25,9 @@
 
     <ImagePanel onLoaded={() => stage?.fitNow()} />
 
-    <ScalePanel
-      onScaleChange={() => stage?.reapplyRealSizeIfActive()}
-    />
+    <ScalePanel onScaleChange={() => stage?.reapplyRealSizeIfActive()} />
 
-    <TransformPanel
-      onAfterTransform={() => stage?.fitNow()}
-    />
+    <TransformPanel onAfterTransform={() => stage?.fitNow()} />
 
     <ReferencesPanel />
 
@@ -43,13 +39,9 @@
 
     <VanishingPointPanel />
 
-    <RealSizePanel
-      onToggle={() => stage?.toggleRealSizeNow()}
-    />
+    <RealSizePanel onToggle={() => stage?.toggleRealSizeNow()} />
 
-    <ProjectPanel
-      onLoaded={() => stage?.fitNow()}
-    />
+    <ProjectPanel />
   </aside>
 
   <button
