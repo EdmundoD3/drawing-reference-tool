@@ -1,7 +1,8 @@
 <script lang="ts">
+// ProjectPanel.svelte
   import { loadProject, saveProject, exportPng } from "../project";
   import { toolState } from "../state/state.svelte";
-    import { transformState } from "../state/transform.svelte";
+  import { transformState } from "../state/transform.svelte";
 
   interface Props {
     onLoaded: () => void;

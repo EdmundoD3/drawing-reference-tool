@@ -18,6 +18,17 @@ import { transformState } from './state/transform.svelte';
 import { LINE_TYPE_LABEL } from './types';
 import type { ProjectFile, RefObjectType } from './types';
 
+
+function projectFileName(imageName: string): string {
+  const dot = imageName.lastIndexOf('.');
+  const baseName =
+    dot > 0
+      ? imageName.slice(0, dot)
+      : imageName;
+
+  return `${baseName}.json`;
+}
+
 export function saveProject() {
   if (!toolState.file.image) {
     alert('Carga una imagen primero.');
@@ -32,6 +43,7 @@ export function saveProject() {
   const project: ProjectFile = {
     version: 1,
     image: tmp.toDataURL('image/png'),
+    imageName: toolState.file.originalFileName,
 
     scaleDim: toolState.scale.scaleDim,
     scaleValue: toolState.scale.scaleValue,
@@ -59,7 +71,9 @@ export function saveProject() {
   const a = document.createElement('a');
 
   a.href = url;
-  a.download = 'proyecto-referencias.json';
+  a.download = projectFileName(
+    toolState.file.originalFileName
+  );
   a.click();
 
   URL.revokeObjectURL(url);
@@ -78,14 +92,21 @@ export function loadProject(file: File, onDone: () => void) {
       return;
     }
 
-    if (!p.image) {
-      alert('El archivo no contiene una imagen de proyecto válida.');
+    if (
+      !p ||
+      typeof p !== 'object' ||
+      p.version !== 1 ||
+      typeof p.image !== 'string' ||
+      typeof p.imageName !== 'string'
+    ) {
+      alert('El archivo no es un proyecto compatible.');
       return;
     }
 
+
     loadImageFromDataUrl(
       p.image,
-      'Proyecto cargado',
+      p.imageName,
       () => {
         toolState.scale.scaleDim = p.scaleDim || 'width';
         toolState.scale.scaleValue = p.scaleValue || 14.5;

@@ -7,6 +7,7 @@ import { freshTypeCounters, toolState } from "./state.svelte";
 import { cleanTransform, transformState } from "./transform.svelte";
 
 // ---------------------------------------------------------------
+
 export function loadImageFile(file: File, onReady?: () => void) {
   if (!file || !/^image\/(png|jpe?g|webp)$/.test(file.type)) return;
 
@@ -15,8 +16,10 @@ export function loadImageFile(file: File, onReady?: () => void) {
 
   img.onload = () => {
     toolState.file.image = img;
+    toolState.file.originalFileName = file.name;
     toolState.file.naturalW = img.naturalWidth;
     toolState.file.naturalH = img.naturalHeight;
+
     toolState.file.fileName =
       `${file.name}  ·  ${img.naturalWidth}×${img.naturalHeight} px`;
 
@@ -30,9 +33,10 @@ export function loadImageFile(file: File, onReady?: () => void) {
   img.src = url;
 }
 
+
 export function loadImageFromDataUrl(
   dataUrl: string,
-  label: string,
+  fileName: string,
   onReady: () => void
 ) {
   const img = new Image();
@@ -41,7 +45,10 @@ export function loadImageFromDataUrl(
     toolState.file.image = img;
     toolState.file.naturalW = img.naturalWidth;
     toolState.file.naturalH = img.naturalHeight;
-    toolState.file.fileName = label;
+
+    toolState.file.originalFileName = fileName;
+    toolState.file.fileName =
+      `${fileName}  ·  ${img.naturalWidth}×${img.naturalHeight} px`;
 
     cleanTransform();
 
@@ -50,6 +57,7 @@ export function loadImageFromDataUrl(
 
   img.src = dataUrl;
 }
+
 
 function resetForNewImage() {
   cleanTransform();

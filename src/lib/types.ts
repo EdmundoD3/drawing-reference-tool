@@ -62,6 +62,7 @@ type FileState = {
     naturalW: number;
     naturalH: number;
     fileName: string;
+    originalFileName: string;
 };
 
 type ScaleState = {
@@ -110,6 +111,7 @@ export interface ProjectFile {
   version: 1;
 
   image: string;
+  imageName: string;
 
   scaleDim: ScaleDim;
   scaleValue: number;

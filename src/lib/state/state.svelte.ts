@@ -21,8 +21,8 @@ export const toolState = $state({
     naturalW: 0,
     naturalH: 0,
     fileName: '',
+    originalFileName: '',
   },
-
   scale: {
     scaleDim: 'width' as ScaleDim,
     scaleValue: 14.5,
