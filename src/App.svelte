@@ -11,8 +11,10 @@
   import ProjectPanel from "./lib/components/ProjectPanel.svelte";
   import StageCanvas from "./lib/components/StageCanvas.svelte";
   import { uiState } from "./lib/state/ui.svelte";
+  import { loadSavedScale } from "./lib/state/scale.svelte";
 
   let stage: ReturnType<typeof StageCanvas> | undefined = $state();
+  loadSavedScale();
 </script>
 
 <div class="app">

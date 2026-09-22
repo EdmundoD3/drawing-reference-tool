@@ -25,7 +25,7 @@ export const toolState = $state({
   },
   scale: {
     scaleDim: 'width' as ScaleDim,
-    scaleValue: 14.5,
+    scaleValue: 21,
     unit: 'cm' as Unit,
     pxPerUnit: 1,
   },
