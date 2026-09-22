@@ -11,6 +11,8 @@
   import { toolState } from "../state/state.svelte";
   import type { ScaleDim, Unit } from "../types";
   import DimensionIndicator from "./icons/DimensionIndicator.svelte";
+  import CollapsibleSection from "./ui/CollapsibleSection.svelte";
+  import InfoHint from "./ui/InfoHint.svelte";
 
   interface Props {
     onScaleChange: () => void;
@@ -43,12 +45,6 @@
     onScaleChange();
   }
 
-  function presetIcon(icon?: "horizontal" | "vertical") {
-    if (icon === "horizontal") return "▭";
-    if (icon === "vertical") return "▯";
-
-    return "";
-  }
   function imageOrientation(): "portrait" | "landscape" {
     return toolState.file.naturalW >= toolState.file.naturalH
       ? "landscape"
@@ -56,57 +52,19 @@
   }
 </script>
 
-<section class="panel">
-  <h2 style="display:flex; align-items:center; gap:4px;">
-    Escala de referencia
+<CollapsibleSection title="Escala de referencia">
+  <InfoHint>
+    La medida corresponde solamente al lado seleccionado. El otro lado conserva
+    la proporción original de la imagen. Los símbolos ▭ y ▯ indican el lado
+    corto y largo del formato de papel; puedes aplicar cualquiera de ellos al
+    ancho o al alto. La imagen no se gira ni se recorta.
+  </InfoHint>
 
-    <button
-      type="button"
-      aria-label="Información sobre la escala de referencia"
-      aria-expanded={showInfo}
-      onclick={() => (showInfo = !showInfo)}
-      onmouseenter={() => (showInfo = true)}
-      onmouseleave={() => (showInfo = false)}
-      onfocus={() => (showInfo = true)}
-      onblur={() => (showInfo = false)}
-      style="
-        width:18px;
-        height:18px;
-        padding:0;
-        border:1px solid var(--text-dim);
-        border-radius:50%;
-        background:transparent;
-        color:var(--text-dim);
-        font-size:11px;
-        line-height:16px;
-        cursor:help;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-      "
-    >
-      i
-    </button>
-  </h2>
-
-  {#if showInfo}
-    <div
-      style="
-        margin-bottom:10px;
-        padding:8px 10px;
-        border:1px solid var(--border);
-        border-radius:6px;
-        color:var(--text-dim);
-        font-size:12px;
-        line-height:1.45;
-      "
-    >
-      La medida corresponde solamente al lado seleccionado. El otro lado
-      conserva la proporción original de la imagen. Los símbolos ▭ y ▯ indican
-      el lado corto y largo del formato de papel; puedes aplicar cualquiera de
-      ellos al ancho o al alto. La imagen no se gira ni se recorta.
-    </div>
-  {/if}
+  {#snippet summary()}
+    {toolState.scale.scaleDim === "width" ? "Ancho" : "Alto"} · {toolState.scale
+      .scaleValue}
+    {toolState.scale.unit}
+  {/snippet}
 
   <div class="field">
     <label for="scaleDim">Dimensión conocida</label>
@@ -250,7 +208,7 @@
       {otherDimensionLabel()}
     </span>
   </div>
-</section>
+</CollapsibleSection>
 
 <style>
   .quick-size {

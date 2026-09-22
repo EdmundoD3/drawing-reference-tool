@@ -1,15 +1,4 @@
-2. Tamaños de referencia
 
-Todavía no lo hemos trabajado.
-Está pendiente completo:
-
-⬜ Elegir tamaños comunes.
-⬜ Cambiar 14.5 cm por un predeterminado más apropiado.
-⬜ Botones de tamaños rápidos.
-⬜ Guardar último tamaño en localStorage.
-⬜ Cargarlo al iniciar.
-⬜ Decidir cm/mm.
-⬜ Revisar presentación móvil.
 3. Interfaz / UX
 
 Todavía pendiente, aunque algunas decisiones ya las tenemos claras conceptualmente:
