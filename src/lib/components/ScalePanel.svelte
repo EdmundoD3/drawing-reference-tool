@@ -9,7 +9,7 @@
   } from "../state/scale.svelte";
 
   import { toolState } from "../state/state.svelte";
-  import type { ScaleDim, Unit } from "../types";
+  import type { Unit } from "../types";
   import DimensionIndicator from "./icons/DimensionIndicator.svelte";
   import CollapsibleSection from "./ui/CollapsibleSection.svelte";
   import InfoHint from "./ui/InfoHint.svelte";
@@ -19,14 +19,6 @@
   }
 
   let { onScaleChange }: Props = $props();
-
-  let showInfo = $state(false);
-
-  function onDim(e: Event) {
-    setScaleDim((e.target as HTMLSelectElement).value as ScaleDim);
-
-    onScaleChange();
-  }
 
   function onValue(e: Event) {
     setScaleValue(parseFloat((e.target as HTMLInputElement).value));
@@ -69,28 +61,15 @@
   <div class="field">
     <label for="scaleDim">Dimensión conocida</label>
 
-    <div
-      style="
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:6px;
-  "
-    >
+    <div class="scale-dimensions">
       <button
         type="button"
-        class="small"
+        class="small scale-dimension-button"
         class:primary={toolState.scale.scaleDim === "width"}
         onclick={() => {
           setScaleDim("width");
           onScaleChange();
         }}
-        style="
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:7px;
-      min-height:44px;
-    "
       >
         <DimensionIndicator
           orientation={imageOrientation()}
@@ -103,19 +82,12 @@
 
       <button
         type="button"
-        class="small"
+        class="small scale-dimension-button"
         class:primary={toolState.scale.scaleDim === "height"}
         onclick={() => {
           setScaleDim("height");
           onScaleChange();
         }}
-        style="
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:7px;
-      min-height:44px;
-    "
       >
         <DimensionIndicator
           orientation={imageOrientation()}
@@ -126,18 +98,6 @@
         <span>Alto</span>
       </button>
     </div>
-
-    <select
-      id="scaleDim"
-      value={toolState.scale.scaleDim}
-      onchange={onDim}
-      style="display:none;"
-      aria-hidden="true"
-      tabindex="-1"
-    >
-      <option value="width">Ancho</option>
-      <option value="height">Alto</option>
-    </select>
   </div>
 
   <div class="row">
@@ -167,13 +127,7 @@
   <div class="field">
     <span>Tamaños rápidos</span>
 
-    <div
-      style="
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:6px;
-    "
-    >
+    <div class="quick-sizes">
       {#each scalePresets() as preset}
         <button
           type="button"
@@ -197,14 +151,7 @@
   </div>
 
   <div class="field">
-    <span
-      style="
-        font-family:var(--mono);
-        color:var(--text-dim);
-        display:block;
-        font-size:12px;
-      "
-    >
+    <span class="other-dimension-label">
       {otherDimensionLabel()}
     </span>
   </div>
@@ -234,5 +181,28 @@
 
   .quick-size:active {
     transform: scale(0.97);
+  }
+  .scale-dimensions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .scale-dimension-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 44px;
+  }
+  .quick-sizes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .other-dimension-label {
+    font-family: var(--mono);
+    color: var(--text-dim);
+    display: block;
+    font-size: 12px;
   }
 </style>

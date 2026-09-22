@@ -17,6 +17,7 @@
   } from "../interfaces/stageCanvas.interfaces";
   import {
     canvasArea,
+    fileInput,
     mainCanvas,
     rulerCanvas,
     showRefNames,
@@ -25,7 +26,6 @@
   import CalibOverlay from "./calib/CalibOverlay.svelte";
   import CanvasWrap from "./StageCanvas/CanvasWrap.svelte";
   import EmptyOverlay from "./StageCanvas/EmptyOverlay.svelte";
-  import FileInput from "./StageCanvas/FileInput.svelte";
   import {
     onKeyDown,
     onPointerMove,
@@ -36,6 +36,8 @@
   import { applyRealSizeZoom, toggleRealSize } from "../state/realSize.svelte";
   import { loadImageFile } from "../state/image.svelte";
   import { transformState } from "../state/transform.svelte";
+  import { loadProject } from "../project";
+  import { ACEPT_FILES } from "../constants";
 
   const viewport: ViewportFn = () => {
     if (!mainCanvas.value) return;
@@ -289,6 +291,22 @@
     const file = e.dataTransfer?.files?.[0];
     if (file) loadImageFile(file, fitNow);
   }
+
+  function onChangeFile(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+
+    if (!file) return;
+
+    const isProject = file.name.toLowerCase().endsWith(".json");
+
+    if (isProject) {
+      loadProject(file, fitNow);
+    } else {
+      loadImageFile(file, fitNow);
+    }
+
+    fileInput.value!.value = "";
+  }
 </script>
 
 <main class="stage">
@@ -309,6 +327,11 @@
 
     <CalibOverlay {reapplyRealSizeIfActive} />
   </div>
-
-  <FileInput {fitNow} />
+  <!-- input global -->
+  <input
+    bind:this={fileInput.value}
+    type="file"
+    accept={ACEPT_FILES}
+    onchange={onChangeFile}
+  />
 </main>

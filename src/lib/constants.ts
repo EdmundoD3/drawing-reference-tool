@@ -1,6 +1,9 @@
+// constants.ts
 import type { Tool } from "./types";
 
 export const APP_NAME = "Grid Tool";
+export const ACEPT_FILES = "image/png,image/jpeg,image/webp,application/json,.json";
+
 
 export const TOOL_HINTS: Record<Exclude<Tool, null>, string> = {
   'measure': 'Clic para el punto A, luego el punto B',

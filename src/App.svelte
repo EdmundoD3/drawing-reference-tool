@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ImagePanel from "./lib/components/ImagePanel.svelte";
   import ScalePanel from "./lib/components/ScalePanel.svelte";
   import TransformPanel from "./lib/components/TransformPanel.svelte";
   import ReferencesPanel from "./lib/components/ReferencesPanel.svelte";
@@ -25,7 +24,7 @@
       <p>Calca proporciones reales desde una imagen hacia tu lienzo.</p>
     </div>
 
-    <ImagePanel onLoaded={() => stage?.fitNow()} />
+    <ProjectPanel />
 
     <ScalePanel onScaleChange={() => stage?.reapplyRealSizeIfActive()} />
 
@@ -42,8 +41,6 @@
     <VanishingPointPanel />
 
     <RealSizePanel onToggle={() => stage?.toggleRealSizeNow()} />
-
-    <ProjectPanel />
   </aside>
 
   <button
