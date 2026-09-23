@@ -22,7 +22,7 @@
     rulerCanvas,
     showRefNames,
   } from "../shared/stageCanvas.svelte";
-  import StageToolbar from "./StageCanvas/StageToolbar.svelte";
+  import StageToolbar from "./toolbar/StageToolbar.svelte";
   import CalibOverlay from "./calib/CalibOverlay.svelte";
   import CanvasWrap from "./StageCanvas/CanvasWrap.svelte";
   import EmptyOverlay from "./StageCanvas/EmptyOverlay.svelte";
@@ -38,6 +38,7 @@
   import { transformState } from "../state/transform.svelte";
   import { loadProject } from "../project";
   import { ACEPT_FILES } from "../constants";
+    import StageStatusBar from "./toolbar/StageStatusBar.svelte";
 
   const viewport: ViewportFn = () => {
     if (!mainCanvas.value) return;
@@ -310,7 +311,7 @@
 </script>
 
 <main class="stage">
-  <StageToolbar {fitNow} {viewport} {toggleRealSizeNow} />
+  <StageToolbar {fitNow} {toggleRealSizeNow} />
 
   <div
     class="canvas-area"
@@ -327,6 +328,7 @@
 
     <CalibOverlay {reapplyRealSizeIfActive} />
   </div>
+  <StageStatusBar/>
   <!-- input global -->
   <input
     bind:this={fileInput.value}

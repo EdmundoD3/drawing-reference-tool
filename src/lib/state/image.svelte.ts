@@ -1,7 +1,8 @@
 
 // ---------------------------------------------------------------
 // Image loading & orientation
-
+// state/image.svelte.ts
+// ---------------------------------------------------------------
 import { updateScale } from "./scale.svelte";
 import { freshTypeCounters, toolState } from "./state.svelte";
 import { cleanTransform, transformState } from "./transform.svelte";

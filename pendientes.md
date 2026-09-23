@@ -1,28 +1,12 @@
-
-3. Interfaz / UX
-
-Todavía pendiente, aunque algunas decisiones ya las tenemos claras conceptualmente:
-
-⬜ Secciones retractiles.
-⬜ Simplificar carga de imagen.
-⬜ Poder cerrar esa sección después de cargar.
-⬜ Definir secciones abiertas por defecto.
-⬜ Barra superior móvil.
-⬜ Máximo ~2 filas.
-⬜ Menú secundario para acciones poco frecuentes.
-⬜ Táctilidad de botones.
-⬜ Acceso rápido a Real Size.
-⬜ Estado visual de Real Size.
-
-6. Detalles pendientes
-
-Todavía pendiente:
+## 6. Detalles pendientes
 
 ⬜ Buscar funciones antiguas sin utilidad.
-⬜ Buscar código muerto.
-⬜ Revisar consistencia de nombres.
-⬜ Detalles de UX encontrados durante pruebas.
 
+⬜ Buscar código muerto.
+
+⬜ Revisar consistencia de nombres.
+
+⬜ Detalles de UX encontrados durante pruebas.
 
 
 

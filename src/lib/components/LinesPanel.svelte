@@ -12,6 +12,7 @@
   import { refObjectInfo } from "../geometry";
   import { toolState } from "../state/state.svelte";
   import { transformState } from "../state/transform.svelte";
+    import InfoHint from "./ui/InfoHint.svelte";
 
   let myInput = $state<HTMLInputElement | null>(null);
 
@@ -59,10 +60,10 @@
 <section class="panel">
   <h2>Líneas de referencia</h2>
 
-  <span>
-    usa ctrl para mover ambos puntos, usa shift (flecha arriba) para ver los
-    nombres
-  </span>
+  <InfoHint>
+    Usa Ctrl para mover ambos puntos. Usa Shift (flecha arriba) para mostrar los
+    nombres.
+  </InfoHint>
 
   <div class="btnrow">
     <button

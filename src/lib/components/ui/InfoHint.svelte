@@ -53,25 +53,33 @@
 }
 
 .info-button {
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  flex: none;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    max-width: 18px;
+    max-height: 18px;
 
-  border: 1px solid var(--text-dim);
-  border-radius: 50%;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 18px;
 
-  background: transparent;
-  color: var(--text-dim);
+    box-sizing: border-box;
 
-  font-size: 11px;
-  line-height: 16px;
+    border: 1px solid var(--text-dim);
+    border-radius: 50%;
 
-  cursor: help;
+    background: transparent;
+    color: var(--text-dim);
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    font-size: 11px;
+    line-height: 1;
+
+    cursor: help;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 </style>

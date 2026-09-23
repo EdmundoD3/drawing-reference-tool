@@ -1,3 +1,4 @@
+// geometry.ts
 import type { Arc, Measurement, Point, RefObject } from './types';
 
 export function clamp(v: number, a: number, b: number): number {

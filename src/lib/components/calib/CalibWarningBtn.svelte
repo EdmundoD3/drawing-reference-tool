@@ -17,7 +17,7 @@
 
 {#if calibrationState.isCalibrated}
   <button
-    class="small"
+    class="small stage-toolbar-button"
     class:active={toolState.view.realSizeActive}
     aria-label="Mostrar tamaño real"
     title="Mostrar tamaño real en pantalla"
@@ -29,7 +29,7 @@
 
 {#if !calibrationState.isCalibrated}
   <button
-    class="small calibration-warning"
+    class="small calibration-warning stage-toolbar-button"
     aria-label="Pantalla sin calibrar"
     title="Pantalla sin calibrar"
     onclick={showCalibrationWarning}

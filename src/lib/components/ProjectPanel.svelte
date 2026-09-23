@@ -3,14 +3,20 @@
   import { fileInput } from "../shared/stageCanvas.svelte";
   import { toolState } from "../state/state.svelte";
   import { transformState } from "../state/transform.svelte";
-
+    import { uiState } from "../state/ui.svelte";
 </script>
 
 <section class="panel">
   <h2>Archivo</h2>
 
   <div class="btnrow">
-    <button class="small" onclick={() => fileInput.value?.click()}>
+    <button
+      class="small"
+      onclick={() => {
+        fileInput.value?.click();
+        uiState.sidebarOpen = false;
+      }}
+    >
       Abrir
     </button>
   </div>

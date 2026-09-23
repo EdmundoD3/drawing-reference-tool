@@ -1,4 +1,5 @@
 <script lang="ts">
+// RotateToggle.svelte
   import { transformState } from "../../state/transform.svelte";
   import { uiState } from "../../state/ui.svelte";
 
@@ -8,7 +9,7 @@
 </script>
 
 <button
-  class="small rotate-toggle"
+  class="small rotate-toggle stage-toolbar-button"
   class:active={uiState.freeRotateMode}
   disabled={!transformState.oriented}
   aria-label="Rotación libre"

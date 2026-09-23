@@ -1,53 +1,6 @@
-.mobile-names-button {
-    display: block;
-}
-
-.mobile-names-button.active {
-    background: var(--danger);
-    border-color: var(--danger);
-    color: #fff;
-}
-.mobile-move-points-button {
-    display: block;
-}
-
-.mobile-move-points-button.active {
-    background: var(--danger);
-    border-color: var(--danger);
-    color: #fff;
-}
-.mobile-panel-button {
-    display: none;
-}
-
-@media (max-width: 700px) {
-    .mobile-panel-button {
-        display: block;
-        min-width: 40px;
-        min-height: 40px;
-        padding: 6px 9px;
-    }
-}
-
 canvas.main-canvas {
     touch-action: none;
 }
-
-.stage-toolbar {
-    height: 44px;
-    flex: 0 0 auto;
-    background: var(--ink);
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    gap: 16px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text-dim);
-}
-
-
 
 /* -------------------------------------------------------
    Mobile sidebar backdrop
@@ -142,38 +95,6 @@ canvas.main-canvas {
      Toolbar
      ------------------------------------------------------- */
 
-    .stage-toolbar {
-        height: auto;
-        min-height: 48px;
-        padding: 4px 6px;
-        gap: 6px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-    }
-
-    .zoomctl {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        flex-wrap: nowrap;
-        flex-shrink: 0;
-    }
-
-    .zoomctl button {
-        min-width: 40px;
-        min-height: 36px;
-        padding: 6px 9px;
-    }
-
-    .zoomval {
-        min-width: 46px;
-    }
-
-    /* Coordinates take too much room on narrow screens. */
-    .coords {
-        display: none;
-    }
-
     /* Temporary desktop hint is not useful on touch. */
     .toolhint {
         display: none;
@@ -240,10 +161,6 @@ canvas.main-canvas {
     .brand {
         padding: 16px;
     }
-
-    .active-tool-button {
-        min-height: 40px;
-    }
 }
 
 
@@ -252,21 +169,6 @@ canvas.main-canvas {
    ========================================================= */
 
 @media (max-width: 400px) {
-
-    .stage-toolbar {
-        padding: 0 6px;
-        gap: 5px;
-    }
-
-    .zoomctl button {
-        min-width: 38px;
-        padding-left: 7px;
-        padding-right: 7px;
-    }
-
-    .zoomval {
-        min-width: 42px;
-    }
 
     .sidebar {
         height: 80dvh;

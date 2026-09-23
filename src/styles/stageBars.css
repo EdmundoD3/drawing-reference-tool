@@ -1,0 +1,146 @@
+.stage-toolbar {
+    height: 44px;
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 6px;
+    gap: 1rem;
+
+    background: var(--ink);
+    border-bottom: 1px solid var(--line);
+
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+
+    flex-wrap: nowrap;
+}
+
+.mobile-panel-button {
+    margin-left: auto;
+    display: none;
+}
+
+.stage-toolbar-button {
+    height: 36px;
+    min-width: 36px;
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fit-button svg,
+.mobile-move-points-button svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.names-icon {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.mobile-move-points-button,
+.mobile-names-button {
+    display: block;
+}
+
+.mobile-move-points-button.active,
+.mobile-names-button.active {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+@media (max-width: 700px) {
+    .stage-toolbar {
+        height: auto;
+        min-height: 48px;
+        padding: 4px 6px;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .active-tool-button {
+        min-height: 40px;
+    }
+
+    .mobile-panel-button {
+        display: block;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 6px 9px;
+    }
+
+    .fit-button {
+        min-width: 40px;
+        padding: 6px 9px;
+    }
+}
+
+.stage-status {
+    height: 30px;
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 10px;
+
+    background: var(--ink);
+    border-top: 1px solid var(--line);
+
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+.stage-status .coords {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.stage-status .coords span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stage-status .coords b {
+    color: var(--cyan);
+    font-weight: 500;
+}
+
+.stage-status .zoom-status {
+    margin-left: auto;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    color: var(--text);
+}
+
+.stage-status .zoom-status svg {
+    width: 15px;
+    height: 15px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

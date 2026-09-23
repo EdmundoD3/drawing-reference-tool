@@ -210,15 +210,7 @@ export function onPointerMove(e: PointerEvent) {
   }
 
   if (inside) {
-    const p = screenToOriginal(mx, my);
-    
-    coordsText.x =
-      `${fmt(p.x / toolState.scale.pxPerUnit)} ${toolState.scale.unit}`;
-
-    coordsText.y =
-      `${fmt(p.y / toolState.scale.pxPerUnit)} ${toolState.scale.unit}`;
-
-    toolState.tools.hoverPoint = p;
+    updateCoords(mx, my);
   } else {
     coordsText.x = "—";
     coordsText.y = "—";
@@ -335,6 +327,7 @@ export function onPointerDown(e: PointerEvent) {
   if (!point) return;
 
   const { x: mx, y: my } = point;
+  updateCoords(mx, my);
 
   dragging.startX = e.clientX;
   dragging.startY = e.clientY;
@@ -454,4 +447,17 @@ function endPinch() {
   pinch.active = false;
   pinch.lastDistance = 0;
   pinch.lastAngle = 0;
+}
+
+
+function updateCoords(mx: number, my: number) {
+  const p = screenToOriginal(mx, my);
+
+  coordsText.x =
+    `${fmt(p.x / toolState.scale.pxPerUnit)} ${toolState.scale.unit}`;
+
+  coordsText.y =
+    `${fmt(p.y / toolState.scale.pxPerUnit)} ${toolState.scale.unit}`;
+
+  toolState.tools.hoverPoint = p;
 }
