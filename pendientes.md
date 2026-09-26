@@ -1,13 +1,13 @@
-## 6. Detalles pendientes
-
-⬜ Buscar funciones antiguas sin utilidad.
-
-⬜ Buscar código muerto.
-
-⬜ Revisar consistencia de nombres.
-
-⬜ Detalles de UX encontrados durante pruebas.
-
+La idea sería añadir un editor previo de imagen, separado de todo el sistema de referencias:
+Abrir imagen
+Antes de entrar al editor, poder:
+✂️ Recortar
+↻ Girar 90° a la derecha
+↺ Girar 90° a la izquierda
+Confirmar “Aplicar”
+El resultado se convierte en la nueva imagen base
+A partir de ahí, todo el editor trabaja normalmente sobre esa imagen.
+La imagen original deja de ser la que usa el proyecto; el proyecto guarda la versión editada.
 
 
 

@@ -1,7 +1,5 @@
 // calibration.svelte.ts
 
-import { truePxPerUnit } from "./realSize.svelte";
-
 export type CalibrationState = {
   calibrationFactor: number;
   isCalibrated: boolean;
@@ -14,7 +12,6 @@ export type CalibrationState = {
 export const BASE_PX_PER_MM =
   96 / 25.4; // CSS reference pixel assumption (96dpi)
 
-export const CALIBRATION_REFERENCE_MM = 100;
 export const RULER_REFERENCE_MM = 60;
 
 export const CALIBRATION_STATE_DEFAULT: CalibrationState = {

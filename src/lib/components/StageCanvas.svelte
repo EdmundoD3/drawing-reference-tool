@@ -38,7 +38,7 @@
   import { transformState } from "../state/transform.svelte";
   import { loadProject } from "../project";
   import { ACEPT_FILES } from "../constants";
-    import StageStatusBar from "./toolbar/StageStatusBar.svelte";
+  import StageStatusBar from "./toolbar/StageStatusBar.svelte";
 
   const viewport: ViewportFn = () => {
     if (!mainCanvas.value) return;
@@ -328,7 +328,7 @@
 
     <CalibOverlay {reapplyRealSizeIfActive} />
   </div>
-  <StageStatusBar/>
+  <StageStatusBar />
   <!-- input global -->
   <input
     bind:this={fileInput.value}
@@ -337,3 +337,32 @@
     onchange={onChangeFile}
   />
 </main>
+
+<style>
+.stage {
+  display: grid;
+  grid-template-rows: 44px minmax(0, 1fr) 30px;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+
+  overflow: hidden;
+}
+  .canvas-area {
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  background: var(--stage);
+  overflow: hidden;
+}
+
+  @media (max-width: 700px) {
+    .stage {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      flex: 1;
+    }
+  }
+</style>

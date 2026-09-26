@@ -39,58 +39,6 @@ canvas.main-canvas {
    ========================================================= */
 
 @media (max-width: 700px) {
-
-    /* -------------------------------------------------------
-     App
-     ------------------------------------------------------- */
-
-    .app {
-        display: flex;
-        flex-direction: column;
-        width: 100vw;
-        height: 100dvh;
-    }
-
-
-    /* -------------------------------------------------------
-     Sidebar
-     ------------------------------------------------------- */
-
-    .sidebar {
-        position: fixed;
-        z-index: 20;
-
-        left: 0;
-        right: 0;
-        bottom: 0;
-
-        width: 100%;
-        height: min(75dvh, 620px);
-
-        border-right: none;
-        border-top: 1px solid var(--line);
-
-        transform: translateY(100%);
-        transition: transform 180ms ease;
-    }
-
-    .sidebar.open {
-        transform: translateY(0);
-    }
-
-
-    /* -------------------------------------------------------
-     Stage
-     ------------------------------------------------------- */
-
-    .stage {
-        width: 100%;
-        height: 100%;
-        min-height: 0;
-        flex: 1;
-    }
-
-
     /* -------------------------------------------------------
      Toolbar
      ------------------------------------------------------- */
@@ -157,10 +105,6 @@ canvas.main-canvas {
     .panel {
         padding: 14px 16px;
     }
-
-    .brand {
-        padding: 16px;
-    }
 }
 
 
@@ -169,10 +113,6 @@ canvas.main-canvas {
    ========================================================= */
 
 @media (max-width: 400px) {
-
-    .sidebar {
-        height: 80dvh;
-    }
 
     .panel {
         padding-left: 14px;

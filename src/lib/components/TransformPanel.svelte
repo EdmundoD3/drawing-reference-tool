@@ -16,10 +16,10 @@
   }
   let { onAfterTransform }: Props = $props();
 
-  function go(fn: () => void) {
-    fn();
-    onAfterTransform();
-  }
+function go(fn: () => void) {
+  fn();
+  onAfterTransform();
+}
 
   function toggleFreeRotate() {
     uiState.freeRotateMode = !uiState.freeRotateMode;
@@ -68,7 +68,7 @@
     <button
       class="small"
       disabled={!transformState.oriented}
-      onclick={flipHorizontal}
+      onclick={() => go(flipHorizontal)}
     >
       {TITLE.voltearH}
     </button>
@@ -76,7 +76,7 @@
     <button
       class="small"
       disabled={!transformState.oriented}
-      onclick={flipVertical}
+      onclick={() => go(flipVertical)}
     >
       {TITLE.voltearV}
     </button>

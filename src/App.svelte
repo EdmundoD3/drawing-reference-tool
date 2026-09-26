@@ -28,8 +28,6 @@
 
     <ScalePanel onScaleChange={() => stage?.reapplyRealSizeIfActive()} />
 
-    <TransformPanel onAfterTransform={() => stage?.fitNow()} />
-
     <ReferencesPanel />
 
     <!-- <GoldenRatioPanel /> -->
@@ -39,6 +37,8 @@
     <LinesPanel />
 
     <VanishingPointPanel />
+
+    <TransformPanel onAfterTransform={() => stage?.fitNow()} />
 
     <RealSizePanel onToggle={() => stage?.toggleRealSizeNow()} />
   </aside>
@@ -52,3 +52,83 @@
 
   <StageCanvas bind:this={stage} />
 </div>
+
+<style>
+  .app {
+    display: grid;
+    grid-template-columns: 292px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+
+    height: 100vh;
+    width: 100vw;
+
+    min-height: 0;
+  }
+  .sidebar {
+    background: var(--ink);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand {
+    padding: 18px 18px 14px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand .mark {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+  }
+  .brand h1 {
+    margin: 4px 0 0 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .brand p {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 700px) {
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100dvh;
+    }
+    .sidebar {
+      position: fixed;
+      z-index: 20;
+
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      width: 100%;
+      height: min(75dvh, 620px);
+
+      border-right: none;
+      border-top: 1px solid var(--line);
+
+      transform: translateY(100%);
+      transition: transform 180ms ease;
+    }
+    .sidebar.open {
+      transform: translateY(0);
+    }
+
+    .brand {
+      padding: 16px;
+    }
+  }
+  @media (max-width: 400px) {
+    .sidebar {
+      height: 80dvh;
+    }
+  }
+</style>

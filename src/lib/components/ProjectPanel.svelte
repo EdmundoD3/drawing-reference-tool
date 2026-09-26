@@ -1,4 +1,5 @@
 <script lang="ts">
+// ProjectPanel.svelte
   import { saveProject, exportPng } from "../project";
   import { fileInput } from "../shared/stageCanvas.svelte";
   import { toolState } from "../state/state.svelte";
